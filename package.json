@@ -1,0 +1,50 @@
+{
+  "name": "core-types",
+  "version": "0.0.0-development",
+  "description": "Generic type declarations for e.g. TypeScript and JSON Schema",
+  "author": "Gustaf Räntilä",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/grantila/core-types/issues"
+  },
+  "homepage": "https://github.com/grantila/core-types#readme",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "directories": {},
+  "engines": {
+    "node": ">=10"
+  },
+  "files": [
+    "dist"
+  ],
+  "bin": "dist/bin/core-types.js",
+  "scripts": {
+    "build": "./node_modules/.bin/rimraf dist && ./node_modules/.bin/tsc -p tsconfig.prod.json",
+    "test": "node_modules/.bin/jest",
+    "cz": "git-cz"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/grantila/core-types"
+  },
+  "keywords": [
+    "type",
+    "types",
+    "generic",
+    "typescript",
+    "json"
+  ],
+  "devDependencies": {
+    "@types/jest": "^26.0.10",
+    "cz-conventional-changelog": "^3.1.0",
+    "jest": "^26.4.2",
+    "rimraf": "^3.0.1",
+    "ts-jest": "^26.3.0",
+    "typescript": "^4.0.2"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  }
+}
