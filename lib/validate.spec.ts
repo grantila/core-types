@@ -1,6 +1,7 @@
 import { MalformedTypeError } from './error'
 import { validate } from './validate'
 
+
 describe( "validate", ( ) =>
 {
 	it( "should allow simple type", ( ) =>

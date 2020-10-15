@@ -1,5 +1,6 @@
-import { NodeType } from './types'
-import { simplify } from './'
+import { NodeDocument, NodeType } from './types'
+import { simplify } from './simplify'
+
 
 describe( "simplify", ( ) =>
 {
@@ -127,6 +128,76 @@ describe( "simplify", ( ) =>
 			{ type: 'string' },
 			{ type: 'number' },
 		] );
+	} );
+
+	it( "should remove empty ors and ands", ( ) =>
+	{
+		const node: NodeDocument = {
+			version: 1,
+			types: [
+				{
+					name: 'ors',
+					type: 'or',
+					or: [
+						{ type: 'and', and: [ ] },
+						{ type: 'string' },
+						{ type: 'or', or: [ ] },
+					]
+				},
+				{
+					name: 'ands',
+					type: 'and',
+					and: [
+						{ type: 'and', and: [ ] },
+						{ type: 'number' },
+						{ type: 'or', or: [ ] },
+					]
+				},
+			]
+		};
+
+		expect( simplify( node ) ).toStrictEqual( {
+			version: 1,
+			types: [
+				{ name: 'ors', type: 'string' },
+				{ name: 'ands', type: 'number' },
+			]
+		} );
+	} );
+
+	it( "should remove empty ors and ands and prefer 'any' in 'or'", ( ) =>
+	{
+		const node: NodeDocument = {
+			version: 1,
+			types: [
+				{
+					type: "and",
+					and: [
+						{ type: "or", or: [ ] },
+						{
+							type: "or",
+							or: [
+								{
+									type: "string"
+								},
+								{
+									type: "any"
+								}
+							],
+						},
+						{ type: "and", and: [ ] }
+					],
+					name: "StringOrAny"
+				}
+			]
+		};
+
+		expect( simplify( node ) ).toStrictEqual( {
+			version: 1,
+			types: [
+				{ name: 'StringOrAny', type: 'any' },
+			]
+		} );
 	} );
 
 	it( "and types with multiple sub-and and multiple sub-or", ( ) =>

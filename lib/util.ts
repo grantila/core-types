@@ -1,7 +1,16 @@
-import { NodeType, PrimitiveType, NodeWithConstEnum } from "./types"
+import {
+	NodeType,
+	PrimitiveType,
+	NodeWithConstEnum,
+	Types,
+	NodeTypeMap,
+	NamedType,
+	NodeDocument,
+} from "./types"
 
 
-export function uniq< T extends Comparable | unknown >( arr: Array< T > ): Array< T >
+export function uniq< T extends Comparable | unknown >( arr: Array< T > )
+: Array< T >
 {
 	return arr
 		.filter( ( t, index ) =>
@@ -135,4 +144,58 @@ export function union< T extends Comparable >(
 	} );
 
 	return ret;
+}
+
+type SplitTypes = { [ T in Types ]: Array< NodeTypeMap[ T ] >; };
+
+// Split a set of types into individual sets per-type
+export function splitTypes( nodes: Array< NodeType > ): SplitTypes
+{
+	const ret: SplitTypes = {
+		and: [ ],
+		or: [ ],
+		ref: [ ],
+		any: [ ],
+		null: [ ],
+		string: [ ],
+		number: [ ],
+		integer: [ ],
+		boolean: [ ],
+		object: [ ],
+		array: [ ],
+		tuple: [ ],
+	};
+
+	nodes.forEach( node =>
+	{
+		if (
+			node.type !== 'and' && node.type !== 'or'
+			||
+			node.type === 'and' && node.and.length > 0
+			||
+			node.type === 'or' && node.or.length > 0
+		)
+			ret[ node.type ].push( node as any );
+	} );
+
+	return ret;
+}
+
+export function copyName( from: NamedType< any >, to: NamedType< any > )
+: typeof to
+{
+	return typeof from.name === 'undefined' ? to : { ...to, name: from.name };
+}
+
+export function isNonNullable< T >( t: T ): t is NonNullable< T >
+{
+	return t != null;
+}
+
+export function isNodeDocument(
+	t: NodeDocument | NodeType | Array< NodeType >
+)
+: t is NodeDocument
+{
+	return Array.isArray( ( t as NodeDocument ).types );
 }

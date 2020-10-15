@@ -5,20 +5,38 @@ import {
 	Types,
 	NodeTypeMap,
 	NamedType,
+	NodeDocument,
 } from './types'
 import { simplifySingle } from './simplifications/single'
 import { mergeConstEnumUnion } from './simplifications/const-enum'
 import { intersectConstEnum } from './simplifications/intersect-const-enum'
 import { MalformedTypeError } from './error'
 import { mergeAnnotations } from './annotation'
+import { copyName, isNodeDocument, splitTypes } from './util'
 
-
-export function simplify( node: NodeType ): typeof node;
-export function simplify( node: Array< NodeType > ): typeof node;
-export function simplify( node: NodeType | Array< NodeType > ): typeof node
+export function simplify< T extends NodeType | NamedType< any > >(
+	node: T
+)
+: typeof node;
+export function simplify< T extends NodeType | NamedType< any > >(
+	node: Array< T >
+)
+: typeof node;
+export function simplify< T extends NodeType >(
+	node: NodeDocument< 1, T >
+)
+: typeof node;
+export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
+: typeof node
 {
 	if ( Array.isArray( node ) )
 		return node.map( node => simplify( node ) );
+
+	if ( isNodeDocument( node ) )
+		return {
+			...node,
+			types: simplify( ( node as NodeDocument ).types ),
+		} as NodeDocument;
 
 	const wrapName = ( newNode: NodeType ) => copyName( node, newNode );
 
@@ -37,6 +55,7 @@ export function simplify( node: NodeType | Array< NodeType > ): typeof node
 				} )
 			)
 		);
+
 		if ( and.length === 1 )
 			return wrapName( and[ 0 ] );
 		return wrapName( { type: 'and', and } );
@@ -54,6 +73,7 @@ export function simplify( node: NodeType | Array< NodeType > ): typeof node
 				} )
 			)
 		);
+
 		if ( or.length === 1 )
 			return wrapName( or[ 0 ] );
 		return wrapName( { type: 'or', or } );
@@ -93,10 +113,10 @@ function simplifyUnion( nodes: Array< NodeType > ): Array< NodeType >
 			];
 	}
 
-	if ( typeMap.or.length > 1 )
+	if ( typeMap.or.length > 0 )
 		typeMap.or = typeMap.or.filter( ( { or } ) => or.length > 0 );
 
-	if ( typeMap.and.length > 1 )
+	if ( typeMap.and.length > 0 )
 		typeMap.and = typeMap.and.filter( ( { and } ) => and.length > 0 );
 
 	return ( [ ] as Array< NodeType > ).concat( ...Object.values( typeMap ) );
@@ -164,44 +184,11 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 			...cast< 'integer' >( typeMap.any ),
 		] ) ];
 
-	if ( typeMap.or.length > 1 )
+	if ( typeMap.or.length > 0 )
 		typeMap.or = typeMap.or.filter( ( { or } ) => or.length > 0 );
 
-	if ( typeMap.and.length > 1 )
+	if ( typeMap.and.length > 0 )
 		typeMap.and = typeMap.and.filter( ( { and } ) => and.length > 0 );
 
 	return ( [ ] as Array< NodeType > ).concat( ...Object.values( typeMap ) );
-}
-
-type SplitTypes = { [ T in Types ]: Array< NodeTypeMap[ T ] >; };
-
-// Split a set of types into individual sets per-type
-function splitTypes( nodes: Array< NodeType > ): SplitTypes
-{
-	const ret: SplitTypes = {
-		and: [ ],
-		or: [ ],
-		ref: [ ],
-		any: [ ],
-		null: [ ],
-		string: [ ],
-		number: [ ],
-		integer: [ ],
-		boolean: [ ],
-		object: [ ],
-		array: [ ],
-		tuple: [ ],
-	};
-
-	nodes.forEach( node =>
-	{
-		ret[ node.type ].push( node as any );
-	} );
-
-	return ret;
-}
-
-function copyName( from: NamedType< any >, to: NamedType< any > ): typeof to
-{
-	return typeof from.name === 'undefined' ? to : { ...to, name: from.name };
 }

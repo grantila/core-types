@@ -19,8 +19,8 @@
   ],
   "bin": "dist/bin/core-types.js",
   "scripts": {
-    "build": "./node_modules/.bin/rimraf dist && ./node_modules/.bin/tsc -p tsconfig.prod.json",
-    "test": "node_modules/.bin/jest",
+    "build": "rimraf dist && tsc -p tsconfig.prod.json",
+    "test": "jest",
     "cz": "git-cz"
   },
   "repository": {

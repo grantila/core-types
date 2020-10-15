@@ -1,3 +1,26 @@
+
+export interface LineColumn
+{
+	line: number;
+	column: number;
+	offset: number;
+}
+
+export interface LocationWithLineColumn {
+    start?: LineColumn;
+    end?: LineColumn;
+}
+
+export interface LocationOffset
+{
+	start?: number;
+	end?: number;
+}
+
+export type Location =
+	| LocationWithLineColumn
+	| LocationOffset;
+
 export interface CoreTypeAnnotations
 {
 	name?: string;
@@ -5,7 +28,9 @@ export interface CoreTypeAnnotations
 	description?: string;
 	examples?: string | Array< string >;
 	default?: string;
+	see?: string | Array< string >;
 	comment?: string;
+	loc?: LocationOffset | LocationWithLineColumn;
 }
 
 export interface AndType extends CoreTypeAnnotations
@@ -116,21 +141,22 @@ export interface NodeArrayCoreType
 	elementType: NodeType;
 }
 
-export type ArrayType =
+export type ArrayType< T = unknown > =
 	& NodeArrayCoreType
-	& GenericTypeInfo< Array< unknown > >
+	& GenericTypeInfo< Array< T > >
 	& CoreTypeAnnotations;
 
 export interface NodeTupleCoreType
 {
 	type: 'tuple';
 	elementTypes: Array< NodeType >;
+	minItems: number;
 	additionalItems: boolean | NodeType;
 }
 
-export type TupleType =
+export type TupleType< T extends unknown[ ] = unknown[ ] > =
 	& NodeTupleCoreType
-	& GenericTypeInfo< Array< unknown > >
+	& GenericTypeInfo< T >
 	& CoreTypeAnnotations;
 
 export interface NodeTypeMap
@@ -163,3 +189,14 @@ export type NodeWithConstEnum =
 	| ArrayType
 	| TupleType
 	| RefType;
+
+export type NodePath = Array< string | number >;
+
+export interface NodeDocument<
+	Version extends number = 1,
+	T extends NodeType = NodeType
+>
+{
+	version: Version;
+	types: Array< NamedType< T > >;
+}
