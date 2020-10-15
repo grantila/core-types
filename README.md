@@ -12,6 +12,9 @@ Using core-types, e.g. implementing conversions to other type systems is easy, s
 
  * [See](#see) use cases and other packages using this package
  * [Usage](#usage)
+   * [simplify](#simplify) types, merge, flatten and remove unncessary types
+   * [validate](#validate) types
+   * [helpers](#helpers) for package implementors
  * [Specification](#specification) of the types in this package are:
    * [any](#any-type) (any of the below types)
    * [null](#null-type)
@@ -36,69 +39,75 @@ This package is used by [`core-types-json-schema`][core-types-json-schema-github
 
 # Usage
 
-`core-types` provides TypeScript interfaces and types describing the different types. They are all combined in the union type `Node`. There's also a helper function `simplify` which will optimize a core type (a `Node`) and combine unions and intersections, extract single unions and intersections and combine types when they are subsets of each other or a simpler type.
-
-You can think of the generic type `Node` as:
+To create a core-types type, just cast it to `NodeType`.
 
 ```ts
-type Node =
-	{
-		name?: string;
-	}
-	&
-	(
-		| { type: ..., const: ..., enum: ... } // An actual type
-		| { or: Node[ ] }                      // A union type
-		| { and: Node[ ] }                     // An intersection type
-	);
+const myStringType: NodeType = { type: 'string' };
 ```
 
-Example:
+For more information on the specific types, see the [Specification](#specification).
+
+
+## simplify
+
+The function `simplify` can take a type, or an array of types, and returns simplified versions.
+
+Examples of simpifications performed:
+ * An empty `and` or `or` will often be removed.
+ * A union of `any`, `string` and `union` (except for `const` and `enum`) can be simplified as just `any`.
+ * An intersection of `any` and `string` can be simplified to `string`.
+ * An `or` containing child `or`s, will be flattened to the parent `or`.
+ * and more...
+
+The simplify function is type-wise *lossless*, but can remove annotations (e.g. descriptions). It is however usually recommended to perform a simplification after a type has been converted *to* core-types before converting to another type system.
 
 ```ts
-import { Node, simplify } from 'core-types'
+import { simplify } from 'core-types'
 
-const type: Node = {
+const simplified = simplify( myType );
+
+simplify( {
+	type: 'or',
 	or: [
-		{
-			type: 'number',
-			enum: [ 17, 42 ],
-		},
-		{
-			or: [
-				{
-					type: 'number',
-					enum: [ 1 ],
-				},
-				{
-					type: 'string'
-				}
-			]
-		}
+		{ type: 'or', or: [ { type: 'string' } ] },
+		{ type: 'any', const: 'foo' }
 	]
-};
-
-const simplifiedType = simplify( type );
-
-/**
- * simplifiedType is now: {
- *   or: [
- *     {
- *       type: 'number'
- *       enum: [ 1, 17, 42 ],
- *     },
- *     {
- *       type: 'string'
- *     }
- *   ]
- * }
- */
+} ); // { type: 'string', const: 'foo' }
 ```
+
+
+## validate
+
+The `validate` function validates that a `NodeType` type tree is valid.
+
+It ensures e.g.
+ * Non-negative *integer* `minItems`
+ * Non-mismatching enums and const if both are specified.
+
+```ts
+import { validate } from 'core-types'
+
+validate( myType ); // Throws error if not valid
+```
+
+
+## helpers
+
+When implementing conversions to and from core-types, the following helper functions may come in handy:
+
+ * `ensureArray` converts values to arrays of such values, or returns arrays as-is. null and undefined become empty array
+ * `isPrimitiveType` returns true for primitive `NodeType`s
+ * `hasConstEnum` returns true for `NodeType`s which has (or can have) `const` and `enum` properties.
+ * `isEqual` deep-equal comparison (of JSON compatible non-recursive types)
+ * `intersection` returns an array of values found in both of two arrays. Handles primitives as well as arrays and objects (uses `isEqual`)
+ * `union` returns an array of unique values from two arrays. Handles primitives as well as arrays and objects (uses `isEqual`)
+ * `encodePathPart` -
+ * `decodePathPart` -
 
 
 # Specification
 
-The main type is call `NodeType` and is a union of the specific types. A `NodeType` always has a `type` property of the type `Types`. The `Types` is defined as:
+The main type is called `NodeType` and is a union of the specific types. A `NodeType` always has a `type` property of the type `Types`. The `Types` is defined as:
 
 ```ts
 type Types =
@@ -134,7 +143,7 @@ type NodeType =
 	| OrType;
 ```
 
-These types have an optional `name` (string) property which can be converted to be *required* using `NamedType<T = NodeType>`. This is useful when converting to other type systems where at least the top-most types must have types (like JSON Schema definitions or exported TypeScript types/interfaces).
+These types have an optional `name` (string) property which can be converted to be *required* using `NamedType<T = NodeType>`. This is useful when converting to other type systems where at least the top-most types must have names (like JSON Schema definitions or exported TypeScript types/interfaces).
 
 The types also have optional annotation properties `title` (string), `description` (string), `examples` (string or array of strings), `default` (string) and `comment` (string).
 
@@ -145,7 +154,7 @@ All types except `NullType`, `AndType` and `OrType` can have two properties `con
 
 The `AnyType` matches any type. Its `const` and `enum` properties have the element type `T` set to `unknown`.
 
-This corresponds to `any` or `unknown` in TypeScript, and they empty schema `{}` in JSON Schema.
+This corresponds to `any` or `unknown` in TypeScript, and the empty schema `{}` in JSON Schema.
 
 Example: `{ type: 'any' }`
 
@@ -158,7 +167,7 @@ Example: `{ type: 'null' }`
 
 ## boolean type
 
-The `BooleanType` type is equivalent to the TypeScript, JavaScript and JSON types `Boolean` (`true` and `false`).
+The `BooleanType` is equivalent to the TypeScript, JavaScript and JSON `Boolean` (`true` and `false`).
 
 The element type `T` for `const` and `enum` is `boolean`.
 
@@ -213,7 +222,7 @@ Example:
 
 ## array type
 
-The `ArrayType` is used to describe the TypeScript type `Record<NodeType>` and the JavaScript and JSON type `Array`.
+The `ArrayType` is used to describe the TypeScript type `Array<NodeType>` and the JavaScript and JSON type `Array`.
 
 The element type `T` for `const` and `enum` is `Array<any-json-type>`, i.e. arrays of JSON-compatible types defined by the `NodeType` in `elementType`.
 
@@ -230,11 +239,15 @@ Example:
 
 ## tuple type
 
-The `TupleType` describes specific-length arrays where each position has a specific type. It matches the tuple types `[...]` in `TypeScript` and is an `Array` in JavaScript and JSON.
+The `TupleType` describes specific-length arrays where each position has a specific type. It matches the tuple type `[A, B, ...]` in `TypeScript` and is an `Array` in JavaScript and JSON.
 
 The element type `T` for `const` and `enum` is `[...any-json-types]`, i.e. tuples of JSON-compatible types defined by the `NodeType` in the required `elementTypes` and `additionalItems`.
 
-`elementTypes` is defined as `[...NodeType]` and describes the valid types for each position in the tuple for the required tuple elements.
+The extra and required properties for `TupleType` are `elementTypes`, `minItems` and `additionalItems`.
+
+`elementTypes` is defined as `[...NodeType]` and describes the valid types for each position in the tuple for the required and individually typed optional tuple elements.
+
+`minItems` is an integer (TypeScript/JavaScript number) defining the minimum required elements and must not be negative. If this is greater than the number of `elementTypes`, although valid in core-types per se, some conversions will limit it to the size of `elementTypes`.
 
 `additionalProperties` is used to describe optional extra elemenents. It is defined as `boolean | NodeType`. When this is `false`, no additional elements are allowed, and if `true` elements are allowed of any type (`AnyType`). Otherwise additional elemenets are allowed of the defined `NodeType`.
 
@@ -244,8 +257,9 @@ Example:
 	type: 'tuple',
 	elementTypes: [
 		{ type: 'string' },
-		{ type: 'boolean' },
+		{ type: 'boolean' }, // Optional, because minItems is 1
 	],
+	minItems: 1,
 	additionalItems: { type: 'number' },
 }
 ```
@@ -253,7 +267,7 @@ Example:
 
 ## ref type
 
-The `RefType` describes references to other named types. Exactly what this means is up to the implementation of core-types, but it is recommended that a reference type in a list of `NodeType`s refers to a named type within that list. This corresponds to TypeScript named types being referred to in the same file as the type is defined, or JSON Schema `$ref` references only referring to `#/definitions/*` types.
+The `RefType` describes references to other named types. Exactly what this means is up to the implementation of the user of core-types, but it is recommended that a reference type in a list of `NodeType`s refers to a named type within that list. This corresponds to TypeScript named types being referred to in the same file as in which the type is defined, or JSON Schema `$ref` references only referring to `#/definitions/*` types.
 
 A `RefType` has a required property `ref` which is a string corresponding to the name of the reference.
 

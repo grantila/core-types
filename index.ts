@@ -1,13 +1,14 @@
 export * from './lib/types'
 export { simplify } from './lib'
+export { validate } from './lib/validate'
 export {
-	ensureArray,
-	isPrimitiveType,
-	hasConstEnum,
 	ComparablePrimitives,
 	ComparableArray,
 	ComparableObject,
 	Comparable,
+	ensureArray,
+	isPrimitiveType,
+	hasConstEnum,
 	isEqual,
 	encodePathPart,
 	decodePathPart,

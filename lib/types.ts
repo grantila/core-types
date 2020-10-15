@@ -125,6 +125,7 @@ export interface NodeTupleCoreType
 {
 	type: 'tuple';
 	elementTypes: Array< NodeType >;
+	minItems: number;
 	additionalItems: boolean | NodeType;
 }
 
