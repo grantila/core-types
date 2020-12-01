@@ -33,6 +33,20 @@ export function locationToLineColumn(
 	};
 }
 
+export function getPositionOffset< T extends LineColumn | number | undefined >(
+	pos: T
+)
+: T extends undefined ? undefined : number
+{
+	type Ret = T extends undefined ? undefined : number;
+
+	if ( typeof pos === 'undefined' )
+		return pos as undefined as Ret;
+	else if ( typeof pos === 'number' )
+		return pos as number as Ret;
+	return pos.offset as Ret;
+}
+
 /**
  * Use the smallest {start} and the biggest {end} to make a range consiting of
  * all locations

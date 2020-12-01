@@ -1,5 +1,5 @@
 import { mergeLocations } from "./location";
-import type { CoreTypeAnnotations } from "./types"
+import type { CoreTypeAnnotations, NodeType } from "./types"
 import { ensureArray } from "./util"
 
 
@@ -121,6 +121,83 @@ export function stringifyAnnotations(
 	return formatWhitespace && fullComment
 		? wrapWhitespace( fullComment )
 		: fullComment;
+}
+
+export function stripAnnotations< T extends NodeType >(
+	node: T,
+	recursive = true
+)
+: T
+{
+	const {
+		comment,
+		description,
+		default: _default,
+		examples,
+		see,
+		title,
+		...rest
+	} = node;
+
+	const filteredNode = rest as NodeType & T;
+
+	if ( recursive )
+	{
+		if ( filteredNode.type === 'and' )
+			return {
+				...filteredNode,
+				and: filteredNode.and.map( n => stripAnnotations( n, true ) ),
+			};
+		else if ( filteredNode.type === 'or' )
+			return {
+				...filteredNode,
+				or: filteredNode.or.map( n => stripAnnotations( n, true ) ),
+			};
+		else if ( filteredNode.type === 'array' )
+			return {
+				...filteredNode,
+				elementType:
+					stripAnnotations( filteredNode.elementType, true ),
+			};
+		else if ( filteredNode.type === 'tuple' )
+			return {
+				...filteredNode,
+				elementTypes: filteredNode.elementTypes.map( n =>
+					stripAnnotations( n, true )
+				),
+				additionalItems:
+					typeof filteredNode.additionalItems === 'object'
+					? stripAnnotations( filteredNode.additionalItems, true )
+					: filteredNode.additionalItems,
+			};
+		else if ( filteredNode.type === 'object' )
+			return {
+				...filteredNode,
+				properties: Object.fromEntries(
+					Object.keys( filteredNode.properties ).map( key =>
+						[
+							key,
+							{
+								...filteredNode.properties[ key ],
+								node: stripAnnotations(
+									filteredNode.properties[ key ].node,
+									true
+								),
+							}
+						]
+					)
+				),
+				additionalProperties:
+					typeof filteredNode.additionalProperties === 'object'
+					? stripAnnotations(
+						filteredNode.additionalProperties,
+						true
+					)
+					: filteredNode.additionalProperties,
+			};
+	}
+
+	return filteredNode;
 }
 
 function arrayOrSingle< T >( arr: Array< T > ): T | Array< T >

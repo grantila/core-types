@@ -14,19 +14,27 @@ export {
 	decodePathPart,
 	intersection,
 	union,
+	isNonNullable,
 } from './lib/util'
 export {
 	mergeAnnotations,
 	extractAnnotations,
 	stringifyAnnotations,
+	stripAnnotations,
 } from './lib/annotation'
 export {
 	CoreTypesErrorMeta,
 	MalformedTypeError,
 	UnsupportedError,
+	WarnFunction,
 	throwUnsupportedError,
+	isCoreTypesError,
+	decorateErrorMeta,
+	decorateError,
 } from './lib/error'
 export {
 	positionToLineColumn,
 	locationToLineColumn,
+	getPositionOffset,
+	mergeLocations,
 } from './lib/location'

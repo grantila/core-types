@@ -3,6 +3,7 @@
 [![build status][build-image]][build-url]
 [![coverage status][coverage-image]][coverage-url]
 [![Language grade: JavaScript][lgtm-image]][lgtm-url]
+[![Node.JS version][node-version]][node-url]
 
 
 # core-types
@@ -35,7 +36,7 @@ The above describes JSON completely, and is a lowest common denominator for desc
 
 # See
 
-This package is used by [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] (converting to and from JSON Schema), [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] (converting to and from TypeScript types/interfaces) and [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] (converting to and from GraphQL) hence implicitly [`schema-ts`][schema-ts-github-url] [![npmjs][schema-ts-npm-image]][schema-ts-npm-url] (conversion between JSON Schema, TypeScript and GraphQL through core-types).
+This package is used by [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] (converting to and from JSON Schema), [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] (converting to and from TypeScript types/interfaces) and [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] (converting to and from GraphQL) hence implicitly [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] (conversion between JSON Schema, TypeScript and GraphQL through core-types).
 
 
 # Usage
@@ -57,7 +58,7 @@ The function `simplify` can take a type, or an array of types, and returns simpl
 
 Examples of simpifications performed:
  * An empty `and` or `or` will often be removed.
- * A union of `any`, `string` and `union` (except for `const` and `enum`) can be simplified as just `any`.
+ * A union (e.g. of `any` and `string`), except for usages `const` and `enum`, can be simplified as just `any`.
  * An intersection of `any` and `string` can be simplified to `string`.
  * An `or` containing child `or`s, will be flattened to the parent `or`.
  * and more...
@@ -106,6 +107,19 @@ When implementing conversions to and from core-types, the following helper funct
  * `union` returns an array of unique values from two arrays. Handles primitives as well as arrays and objects (uses `isEqual`)
  * `encodePathPart` -
  * `decodePathPart` -
+ * `isNonNullable`
+ * `isCoreTypesError`
+ * `decorateErrorMeta`
+ * `decorateError`
+ * `getPositionOffset`
+ * `mergeLocations`
+
+### Annotations
+
+ * `mergeAnnotations`
+ * `extractAnnotations`
+ * `stringifyAnnotations`
+ * `stripAnnotations`
 
 
 # Specification
@@ -146,9 +160,17 @@ type NodeType =
 	| OrType;
 ```
 
-These types have an optional `name` (string) property which can be converted to be *required* using `NamedType<T = NodeType>`. This is useful when converting to other type systems where at least the top-most types must have names (like JSON Schema definitions or exported TypeScript types/interfaces).
+These types have an optional `name` (string) property which can be converted to be *required* using `NamedType<T = NodeType>`. This is useful when converting to other type systems where at least the top-most types must have names (like JSON Schema definitions or exported TypeScript types/interfaces), and is used by the `NodeDocument`, which is what conversion packages should use:
 
-The types also have optional annotation properties `title` (string), `description` (string), `examples` (string or array of strings), `default` (string) and `comment` (string).
+```ts
+interface NodeDocument
+{
+	version: 1; // core-types only has version 1 so far
+	types: Array< NamedType >;
+}
+```
+
+The types also have optional annotation properties `title` (string), `description` (string), `examples` (string or array of strings), `default` (string), `see` (string or array of strings) and `comment` (string).
 
 All types except `NullType`, `AndType` and `OrType` can have two properties `const` (of type `T`) or `enum` (of type `Array<T>`). The `T` depends on the `NodeType`. These have the same semantics as in JSON Schema, meaning a `const` value is equivalent of an `enum` with only that value. The `enum` can be seen as a type literal union in TypeScript.
 
@@ -362,6 +384,8 @@ Example:
 [coverage-url]: https://coveralls.io/github/grantila/core-types?branch=master
 [lgtm-image]: https://img.shields.io/lgtm/grade/javascript/g/grantila/core-types.svg?logo=lgtm&logoWidth=18
 [lgtm-url]: https://lgtm.com/projects/g/grantila/core-types/context:javascript
+[node-version]: https://img.shields.io/node/v/core-types
+[node-url]: https://nodejs.org/en/
 
 [core-types-json-schema-npm-image]: https://img.shields.io/npm/v/core-types-json-schema.svg
 [core-types-json-schema-npm-url]: https://npmjs.org/package/core-types-json-schema
@@ -372,6 +396,6 @@ Example:
 [core-types-graphql-npm-image]: https://img.shields.io/npm/v/core-types-graphql.svg
 [core-types-graphql-npm-url]: https://npmjs.org/package/core-types-graphql
 [core-types-graphql-github-url]: https://github.com/grantila/core-types-graphql
-[schema-ts-npm-image]: https://img.shields.io/npm/v/schema-ts.svg
-[schema-ts-npm-url]: https://npmjs.org/package/schema-ts
-[schema-ts-github-url]: https://github.com/grantila/schema-ts
+[typeconv-npm-image]: https://img.shields.io/npm/v/typeconv.svg
+[typeconv-npm-url]: https://npmjs.org/package/typeconv
+[typeconv-github-url]: https://github.com/grantila/typeconv
