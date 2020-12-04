@@ -168,7 +168,7 @@ describe( "simplifyEnumAndConst", ( ) =>
 			);
 
 			expect( rest ).toStrictEqual( { type: 'string' } );
-			expect( _enum.sort( ) ).toStrictEqual( [ 'foo', 'bar' ].sort( ) );
+			expect( _enum?.sort( ) ).toStrictEqual( [ 'foo', 'bar' ].sort( ) );
 		} );
 	} );
 } );

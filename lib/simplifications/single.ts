@@ -4,7 +4,7 @@ import { simplifyEnumAndConst } from './const-enum'
 
 export function simplifySingle<
 	T extends Exclude< NodeType, OrType | AndType >
->( node: T ): typeof node
+>( node: T ): NodeType
 {
 	if (
 		node.type === 'boolean' ||

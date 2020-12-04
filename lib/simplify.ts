@@ -6,6 +6,7 @@ import {
 	NodeTypeMap,
 	NamedType,
 	NodeDocument,
+	BooleanType,
 } from './types'
 import { simplifySingle } from './simplifications/single'
 import { mergeConstEnumUnion } from './simplifications/const-enum'
@@ -98,7 +99,9 @@ function simplifyUnion( nodes: Array< NodeType > ): Array< NodeType >
 	}
 
 	if ( typeMap.boolean.length === 1 )
-		typeMap.boolean = [ simplifySingle( typeMap.boolean[ 0 ] ) ];
+		typeMap.boolean = [
+			simplifySingle( typeMap.boolean[ 0 ] ) as BooleanType
+		];
 	else if ( typeMap.boolean.length > 1 )
 	{
 		const bools = mergeConstEnumUnion( typeMap.boolean );
@@ -107,7 +110,8 @@ function simplifyUnion( nodes: Array< NodeType > ): Array< NodeType >
 			typeMap.boolean = [ { type: 'boolean' } ];
 		else
 			typeMap.boolean = [
-				simplifySingle( { type: 'boolean', enum: bools } )
+				simplifySingle( { type: 'boolean', enum: bools } ) as
+					BooleanType
 			];
 	}
 
