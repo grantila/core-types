@@ -14,18 +14,16 @@ import { MalformedTypeError } from './error'
 import { mergeAnnotations } from './annotation'
 import { copyName, isNodeDocument, splitTypes } from './util'
 
-export function simplify< T extends NodeType | NamedType< any > >(
-	node: T
-)
-: typeof node;
-export function simplify< T extends NodeType | NamedType< any > >(
-	node: Array< T >
-)
-: typeof node;
+export function simplify< T extends NamedType< any > >( node: T )
+: NamedType< any >;
+export function simplify< T extends NamedType< any > >( node: Array< T > )
+: NamedType< any >;
+export function simplify< T extends NodeType >( node: T ): NodeType;
+export function simplify< T extends NodeType >( node: Array< T > ) : NodeType;
 export function simplify< T extends NodeType >(
 	node: NodeDocument< 1, T >
 )
-: typeof node;
+: NodeDocument< 1, NodeType >;
 export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 : typeof node
 {
