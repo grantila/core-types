@@ -1,0 +1,34 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`annotation stringifyAnnotations should stringify everything corrently with arrays 1`] = `
+"Title
+
+The description
+on multiple lines...
+
+@example
+    Ex1
+@example
+    Ex2 is here
+
+@default
+    Joe
+
+@see This thing
+@see and this too"
+`;
+
+exports[`annotation stringifyAnnotations should stringify everything corrently with singles 1`] = `
+"Title
+
+The description
+on multiple lines...
+
+@example
+    The example
+
+@default
+    Joe
+
+@see Interesting"
+`;

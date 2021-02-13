@@ -50,13 +50,23 @@ export function mergeAnnotations( nodes: Array< CoreTypeAnnotations > )
 export function extractAnnotations( node: CoreTypeAnnotations )
 : CoreTypeAnnotations
 {
-	const { title, description, examples, default: _default, comment } = node;
+	const {
+		title,
+		description,
+		examples,
+		default:
+		_default,
+		comment,
+		see,
+	} = node;
+
 	return {
 		...( title ? { title } : { } ),
 		...( description ? { description } : { } ),
 		...( examples ? { examples } : { } ),
 		...( _default ? { default: _default } : { } ),
 		...( comment ? { comment } : { } ),
+		...( see ? { see } : { } ),
 	};
 }
 
@@ -100,7 +110,7 @@ export function stringifyAnnotations(
 )
 : string
 {
-	const { title, description, examples, default: _default, comment } = node;
+	const { title, description, examples, default: _default, comment, see } = node;
 	const fullComment = makeSafeComment(
 		[
 			title,
@@ -110,6 +120,9 @@ export function stringifyAnnotations(
 			] ),
 			...( _default === undefined ? [ ] : [
 				formatDefault( _default )
+			] ),
+			...( see == undefined ? [ ] : [
+				formatSee( ensureArray( see ) )
 			] ),
 			...( includeComment ? [ comment ] : [ ] ),
 		]
@@ -229,9 +242,20 @@ function formatDefault( _default: string ): string
 	return lines.trim( );
 }
 
+function formatSee( see: Array< string > ): string
+{
+	const lines =
+		see.map( see => "@see " + stringify( see ) )
+		.join( "\n" );
+
+	return lines.trim( );
+}
+
 function stringify( value: any )
 {
-	return JSON.stringify( value, null, 2 );
+	return typeof value === "string"
+		? value
+		: JSON.stringify( value, null, 2 );
 }
 
 function indent( lines: Array< string >, indent: number, bullet = false )

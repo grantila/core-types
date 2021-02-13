@@ -34,7 +34,7 @@ export function ensureArray< T >( t: T | Array< T > | undefined | null )
 }
 
 export const isPrimitiveType = ( node: NodeType ): node is PrimitiveType =>
-	[ "null", "string", "number", "integer", "boolean"].includes( node.type );
+	[ "null", "string", "number", "integer", "boolean" ].includes( node.type );
 
 export const constEnumTypes = new Set< NodeType[ 'type' ] >( [
 	'any',

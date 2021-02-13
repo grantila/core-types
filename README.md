@@ -54,7 +54,7 @@ For more information on the specific types, see the [Specification](#specificati
 
 ## simplify
 
-The function `simplify` can take a type, or an array of types, and returns simplified versions.
+The function `simplify` can take a type, or an array of types, and returns simplified type definitions.
 
 Examples of simpifications performed:
  * An empty `and` or `or` will often be removed.
