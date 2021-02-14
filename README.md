@@ -121,6 +121,19 @@ When implementing conversions to and from core-types, the following helper funct
  * `stringifyAnnotations`
  * `stripAnnotations`
 
+### Conversion
+
+When converting, a conversion package is recommended to return a `ConversionResult<T>`, i.e. the data as property `data` in an object which also contains information about the conversion:
+
+```ts
+interface ConversionResult< T = string >
+{
+	data: T;
+	convertedTypes: Array< string >;
+	notConvertedTypes: Array< string >;
+}
+```
+
 
 # Specification
 

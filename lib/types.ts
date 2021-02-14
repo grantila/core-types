@@ -200,3 +200,10 @@ export interface NodeDocument<
 	version: Version;
 	types: Array< NamedType< T > >;
 }
+
+export interface ConversionResult< T = string >
+{
+	data: T;
+	convertedTypes: Array< string >;
+	notConvertedTypes: Array< string >;
+}
