@@ -4,6 +4,6 @@ module.exports = {
 	testMatch: [ '<rootDir>/lib/**/*.spec.ts' ],
 	collectCoverage: true,
 	collectCoverageFrom: [ '<rootDir>/lib/**' ],
-	coveragePathIgnorePatterns: [ '/node_modules/', '/test/' ],
+	coveragePathIgnorePatterns: [ '/node_modules/', '/__snapshots__/' ],
 	coverageReporters: [ 'lcov', 'text', 'html' ],
 };

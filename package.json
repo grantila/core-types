@@ -1,7 +1,7 @@
 {
   "name": "core-types",
   "version": "0.0.0-development",
-  "description": "Generic type declarations for e.g. TypeScript and JSON Schema",
+  "description": "Generic type declarations for e.g. TypeScript, GraphQL and JSON Schema",
   "author": "Gustaf Räntilä",
   "license": "MIT",
   "bugs": {
@@ -35,7 +35,9 @@
     "types",
     "generic",
     "typescript",
-    "json"
+    "graphql",
+    "json",
+    "schema"
   ],
   "devDependencies": {
     "@types/jest": "^26.0.15",

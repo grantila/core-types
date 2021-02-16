@@ -8,6 +8,7 @@ export interface CoreTypesErrorMeta
 	loc?: Location;
 	source?: string;
 	filename?: string;
+	relatedError?: Error;
 }
 
 export class CoreTypesError extends Error implements CoreTypesErrorMeta
@@ -17,6 +18,7 @@ export class CoreTypesError extends Error implements CoreTypesErrorMeta
 	public loc?: Location;
 	public source?: string;
 	public filename?: string;
+	public relatedError?: Error;
 
 	constructor( message: string, meta: CoreTypesErrorMeta = { } )
 	{
@@ -28,6 +30,7 @@ export class CoreTypesError extends Error implements CoreTypesErrorMeta
 		this.loc = meta.loc;
 		this.source = meta.source;
 		this.filename = meta.filename;
+		this.relatedError = meta.relatedError;
 	}
 }
 
@@ -49,6 +52,15 @@ export class UnsupportedError extends CoreTypesError
 	}
 }
 
+export class RelatedError extends CoreTypesError
+{
+	constructor( err: Error, meta: CoreTypesErrorMeta = { } )
+	{
+		super( err.message, { ...meta, relatedError: err } );
+		Object.setPrototypeOf( this, RelatedError.prototype );
+	}
+}
+
 export function throwUnsupportedError(
 	msg: string,
 	node: NodeType,
@@ -64,6 +76,15 @@ export function throwUnsupportedError(
 			...( path ? { path } : { } ),
 		}
 	);
+}
+
+export function throwRelatedError(
+	err: Error,
+	meta?: Omit< CoreTypesErrorMeta, 'relatedError' >
+)
+: never
+{
+	throw new RelatedError( err, meta );
 }
 
 export function isCoreTypesError( err: Error | CoreTypesError )
