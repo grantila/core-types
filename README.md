@@ -105,8 +105,6 @@ When implementing conversions to and from core-types, the following helper funct
  * `isEqual` deep-equal comparison (of JSON compatible non-recursive types)
  * `intersection` returns an array of values found in both of two arrays. Handles primitives as well as arrays and objects (uses `isEqual`)
  * `union` returns an array of unique values from two arrays. Handles primitives as well as arrays and objects (uses `isEqual`)
- * `encodePathPart` -
- * `decodePathPart` -
  * `isNonNullable`
  * `isCoreTypesError`
  * `decorateErrorMeta`

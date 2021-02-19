@@ -5,8 +5,6 @@ import {
 	isPrimitiveType,
 	hasConstEnum,
 	isEqual,
-	encodePathPart,
-	decodePathPart,
 	intersection,
 	union,
 } from './util'
@@ -219,16 +217,6 @@ describe( "utils", ( ) =>
 	describe( "isEqual", ( ) =>
 	{
 		isEqual;
-	} );
-
-	describe( "encodePathPart", ( ) =>
-	{
-		encodePathPart;
-	} );
-
-	describe( "decodePathPart", ( ) =>
-	{
-		decodePathPart;
 	} );
 
 	describe( "intersection", ( ) =>

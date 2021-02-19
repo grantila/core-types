@@ -99,16 +99,6 @@ export function isEqual< T extends Comparable, U extends Comparable >
 		return a === ( b as ComparablePrimitives );
 }
 
-export function encodePathPart( part: string ): string
-{
-	return encodeURIComponent( part );
-}
-
-export function decodePathPart( part: string ): string
-{
-	return decodeURIComponent( part );
-}
-
 export function intersection< T extends Comparable >(
 	a: Array< T >,
 	b: Array< T >

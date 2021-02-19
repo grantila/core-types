@@ -10,8 +10,6 @@ export {
 	isPrimitiveType,
 	hasConstEnum,
 	isEqual,
-	encodePathPart,
-	decodePathPart,
 	intersection,
 	union,
 	isNonNullable,
