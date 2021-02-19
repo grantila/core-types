@@ -120,6 +120,7 @@ When implementing conversions to and from core-types, the following helper funct
  * `extractAnnotations`
  * `stringifyAnnotations`
  * `stripAnnotations`
+ * `stringify`
 
 ### Conversion
 

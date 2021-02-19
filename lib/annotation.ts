@@ -251,7 +251,7 @@ function formatSee( see: Array< string > ): string
 	return lines.trim( );
 }
 
-function stringify( value: any )
+export function stringify( value: any )
 {
 	return typeof value === "string"
 		? value

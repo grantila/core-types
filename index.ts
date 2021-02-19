@@ -21,6 +21,7 @@ export {
 	extractAnnotations,
 	stringifyAnnotations,
 	stripAnnotations,
+	stringify,
 } from './lib/annotation'
 export {
 	CoreTypesErrorMeta,
