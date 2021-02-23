@@ -316,6 +316,38 @@ describe( "simplify", ( ) =>
 		} );
 	} );
 
+	fit( "maintain or-order", ( ) =>
+	{
+		const node1: NodeType = {
+			type: 'or',
+			or: [
+				{
+					type: 'string',
+				},
+				{
+					type: 'number',
+				},
+			]
+		};
+		const result1 = simplify( node1 );
+		expect( result1 ).toStrictEqual( node1 );
+
+		// This will ensure issue #2
+		// const node2: NodeType = {
+		// 	type: 'or',
+		// 	or: [
+		// 		{
+		// 			type: 'number',
+		// 		},
+		// 		{
+		// 			type: 'string',
+		// 		},
+		// 	]
+		// };
+		// const result2 = simplify( node2 );
+		// expect( result2 ).toStrictEqual( node2 );
+	} );
+
 	it( "and with any", ( ) =>
 	{
 		const node: NodeType = {
