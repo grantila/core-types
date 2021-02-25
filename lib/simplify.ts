@@ -79,6 +79,7 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 	}
 	else
 	{
+		// istanbul ignore next
 		throw new MalformedTypeError( "Invalid node", node );
 	}
 }

@@ -4,6 +4,54 @@ import { simplify } from './simplify'
 
 describe( "simplify", ( ) =>
 {
+	it( "document", ( ) =>
+	{
+		const result = simplify( {
+			version: 1,
+			types: [
+				{
+					type: 'string',
+					const: "foo",
+				},
+			],
+		} );
+
+		expect( result ).toStrictEqual( {
+			version: 1,
+			types: [
+				{
+					type: 'string',
+					const: 'foo',
+				},
+			],
+		} );
+	} );
+
+	it( "array of types", ( ) =>
+	{
+		const result = simplify( [
+			{
+				type: 'string',
+				const: "foo",
+			},
+			{
+				type: 'number',
+				const: 3,
+			},
+		] );
+
+		expect( result ).toStrictEqual( [
+			{
+				type: 'string',
+				const: 'foo',
+			},
+			{
+				type: 'number',
+				const: 3,
+			},
+		] );
+	} );
+
 	it( "primitive type", ( ) =>
 	{
 		const result = simplify( {
@@ -14,6 +62,66 @@ describe( "simplify", ( ) =>
 		expect( result ).toStrictEqual( {
 			type: 'string',
 			const: 'foo',
+		} );
+	} );
+
+	it( "bool union true and false", ( ) =>
+	{
+		const result = simplify( {
+			type: 'or',
+			or: [
+				{
+					type: 'boolean',
+					const: true,
+				},
+				{
+					type: 'boolean',
+					const: false,
+				}
+			],
+		} );
+
+		expect( result ).toStrictEqual( { type: 'boolean' } );
+	} );
+
+	it( "bool union empty enums", ( ) =>
+	{
+		const result = simplify( {
+			type: 'or',
+			or: [
+				{ type: 'boolean' },
+				{ type: 'boolean' }
+			],
+		} );
+
+		expect( result ).toStrictEqual( { type: 'boolean' } );
+	} );
+
+	it( "or union multiple", ( ) =>
+	{
+		const result = simplify( {
+			type: 'or',
+			or: [
+				{
+					type: 'or',
+					or: [ { type: 'string' }, { type: 'number' } ],
+				},
+				{
+					type: 'or',
+					or: [ { type: 'boolean' }, { type: 'integer' } ],
+				}
+			],
+		} );
+
+		expect( result ).toStrictEqual( {
+			type: 'or',
+			or: [
+				{ type: 'string' },
+				{ type: 'number' },
+				// TODO: Reverse the order of these:
+				{ type: 'integer' },
+				{ type: 'boolean' },
+			],
 		} );
 	} );
 
@@ -316,7 +424,7 @@ describe( "simplify", ( ) =>
 		} );
 	} );
 
-	fit( "maintain or-order", ( ) =>
+	it( "maintain or-order", ( ) =>
 	{
 		const node1: NodeType = {
 			type: 'or',

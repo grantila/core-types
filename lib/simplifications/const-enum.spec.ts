@@ -42,11 +42,33 @@ describe( "combineConstAndEnum", ( ) =>
 
 describe( "mergeConstEnumUnion", ( ) =>
 {
-	mergeConstEnumUnion;
-	// it( "no const or enum", ( ) =>
-	// {
-	// 	expect( mergeConstEnumUnion( { } ) ).toStrictEqual( [ ] );
-	// } );
+	it( "no types", ( ) =>
+	{
+		expect( mergeConstEnumUnion( [ ] ) ).toStrictEqual( [ ] );
+	} );
+
+	it( "one empty type", ( ) =>
+	{
+		expect( mergeConstEnumUnion( [ { type: 'string' } ] ) )
+			.toStrictEqual( [ ] );
+	} );
+
+	it( "one empty two other", ( ) =>
+	{
+		expect( mergeConstEnumUnion( [
+			{ type: 'string' },
+			{ type: 'string', const: 'foo' },
+			{ type: 'string', enum: [ 'foo', 'bar', 'baz' ] },
+		] ) ).toStrictEqual( [ ] );
+	} );
+
+	it( "one const, one enum", ( ) =>
+	{
+		expect( mergeConstEnumUnion( [
+			{ type: 'string', const: 'foo' },
+			{ type: 'string', enum: [ 'bar', 'foo', 'baz' ] },
+		] ) ).toStrictEqual( [ 'foo', 'bar', 'baz' ] );
+	} );
 
 	// it( "only const", ( ) =>
 	// {

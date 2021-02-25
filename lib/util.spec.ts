@@ -216,7 +216,40 @@ describe( "utils", ( ) =>
 
 	describe( "isEqual", ( ) =>
 	{
-		isEqual;
+		it( "not same typeof", ( ) =>
+		{
+			expect( isEqual( 4, '4' ) ).toBe( false );
+		} );
+
+		it( "not same nullish", ( ) =>
+		{
+			expect( isEqual( { }, null ) ).toBe( false );
+		} );
+
+		it( "both null", ( ) =>
+		{
+			expect( isEqual( null, null ) ).toBe( true );
+		} );
+
+		it( "arrays of different length", ( ) =>
+		{
+			expect( isEqual( [ 3 ], [ ] ) ).toBe( false );
+		} );
+
+		it( "arrays of same length, but different content", ( ) =>
+		{
+			expect( isEqual( [ 3 ], [ '3' ] ) ).toBe( false );
+		} );
+
+		it( "arrays of same length, with equal content", ( ) =>
+		{
+			expect( isEqual( [ 3 ], [ 3 ] ) ).toBe( true );
+		} );
+
+		it( "one arrays, one not", ( ) =>
+		{
+			expect( isEqual( [ ], { } ) ).toBe( false );
+		} );
 	} );
 
 	describe( "intersection", ( ) =>
@@ -226,6 +259,20 @@ describe( "utils", ( ) =>
 
 	describe( "union", ( ) =>
 	{
-		union;
+		it( "should union both empty", ( ) =>
+		{
+			expect( union( [ ], [ ] ) ).toStrictEqual( [ ] );
+		} );
+
+		it( "should union one empty", ( ) =>
+		{
+			expect( union( [ ], [ 2, 3 ] ) ).toStrictEqual( [ 2, 3 ] );
+		} );
+
+		it( "should union correctly", ( ) =>
+		{
+			expect( union( [ 1, 2, 4, 5 ], [ 2, 3, 4 ] ) )
+				.toStrictEqual( [ 1, 2, 4, 5, 3 ] );
+		} );
 	} );
 } );

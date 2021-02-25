@@ -1,8 +1,10 @@
 import {
 	positionToLineColumn,
 	locationToLineColumn,
+	getPositionOffset,
 	mergeLocations,
 } from './location'
+import { LocationWithLineColumn } from './types'
 
 
 describe( "location", ( ) =>
@@ -21,26 +23,71 @@ describe( "location", ( ) =>
 
 	describe( "locationToLineColumn", ( ) =>
 	{
-		it( "", ( ) =>
+		it( "should return location if start is an object", ( ) =>
 		{
-			locationToLineColumn;
+			const loc = { start: { } } as LocationWithLineColumn;
+			expect( locationToLineColumn( '', loc ) ).toBe( loc );
+		} );
+
+		it( "should return location undefined if undefined", ( ) =>
+		{
+			const loc = { start: undefined } as LocationWithLineColumn;
+			expect( locationToLineColumn( '', loc ) ).toStrictEqual( loc );
+		} );
+
+		it( "should return only start properly", ( ) =>
+		{
+			const loc = { start: 4 };
+			expect( locationToLineColumn( 'hello world', loc ) )
+				.toStrictEqual( { start: { offset: 4, line: 1, column: 4 } } );
+		} );
+
+		it( "should return start and end properly", ( ) =>
+		{
+			const loc = { start: 4, end: 6 };
+			expect( locationToLineColumn( 'hello world', loc ) )
+				.toStrictEqual( {
+					start: { offset: 4, line: 1, column: 4 },
+					end: { offset: 6, line: 1, column: 6 },
+				} );
+		} );
+	} );
+
+	describe( "getPositionOffset", ( ) =>
+	{
+		it( "undefined", ( ) =>
+		{
+			expect( getPositionOffset( undefined ) ).toBe( undefined );
+		} );
+
+		it( "number", ( ) =>
+		{
+			expect( getPositionOffset( 47 ) ).toBe( 47 );
+		} );
+
+		it( "object", ( ) =>
+		{
+			expect( getPositionOffset( { offset: 42, line: 2, column: 4 } ) )
+				.toBe( 42 );
 		} );
 	} );
 
 	describe( "mergeLocations", ( ) =>
 	{
-		it( "numbers only", ( ) =>
+		it( "should merge", ( ) =>
 		{
-			mergeLocations( [
-				undefined,
-				{
-					start: 5,
-					end: 4,
-				},
-				{
-					start: 3,
-				}
-			] );
+			expect(
+				mergeLocations( [
+					undefined,
+					{
+						start: 5,
+						end: 4,
+					},
+					{
+						start: 3,
+					}
+				] )
+			).toStrictEqual( { start: 3, end: 4 } );
 		} );
 	} );
 } );
