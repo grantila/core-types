@@ -36,7 +36,7 @@ The above describes JSON completely, and is a lowest common denominator for desc
 
 # See
 
-This package is used by [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] (converting to and from JSON Schema), [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] (converting to and from TypeScript types/interfaces) and [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] (converting to and from GraphQL) hence implicitly [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] (conversion between JSON Schema, TypeScript and GraphQL through core-types).
+This package is used by [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] (converting to and from JSON Schema / Open API), [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] (converting to and from TypeScript types/interfaces) and [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] (converting to and from GraphQL) hence implicitly [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] (conversion between JSON Schema, TypeScript, GraphQL and Open API through core-types).
 
 
 # Usage
