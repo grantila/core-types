@@ -1,4 +1,4 @@
-import { NodeDocument, NodeType } from './types'
+import { NodeDocument, NodeType, OrType } from './types'
 import { simplify } from './simplify'
 
 
@@ -10,8 +10,9 @@ describe( "simplify", ( ) =>
 			version: 1,
 			types: [
 				{
+					name: 'x',
 					type: 'string',
-					const: "foo",
+					const: 'foo',
 				},
 			],
 		} );
@@ -20,6 +21,7 @@ describe( "simplify", ( ) =>
 			version: 1,
 			types: [
 				{
+					name: 'x',
 					type: 'string',
 					const: 'foo',
 				},
@@ -32,7 +34,7 @@ describe( "simplify", ( ) =>
 		const result = simplify( [
 			{
 				type: 'string',
-				const: "foo",
+				const: 'foo',
 			},
 			{
 				type: 'number',
@@ -56,7 +58,7 @@ describe( "simplify", ( ) =>
 	{
 		const result = simplify( {
 			type: 'string',
-			const: "foo",
+			const: 'foo',
 		} );
 
 		expect( result ).toStrictEqual( {
@@ -270,6 +272,183 @@ describe( "simplify", ( ) =>
 				{ name: 'ors', type: 'string' },
 				{ name: 'ands', type: 'number' },
 			]
+		} );
+	} );
+
+	describe( "should remove empty ors and ands in nested structures", ( ) =>
+	{
+		const bloatedAndsAndOrs: OrType = {
+			type: 'or',
+			or: [
+				{
+					type: 'or',
+					or: [
+						{ type: 'and', and: [ ] },
+						{ type: 'string' },
+						{ type: 'or', or: [ ] },
+					]
+				},
+				{
+					type: 'and',
+					and: [
+						{ type: 'and', and: [ ] },
+						{ type: 'number' },
+						{ type: 'or', or: [ ] },
+					]
+				},
+			],
+		};
+		const simpleAndsAndOrs: OrType = {
+			type: 'or',
+			or: [
+				{ type: 'string' },
+				{ type: 'number' },
+			],
+		};
+
+		it( "inside an object", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'o',
+						type: 'object',
+						additionalProperties: false,
+						properties: {
+							foo: { required: true, node: bloatedAndsAndOrs },
+						},
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'o',
+						type: 'object',
+						additionalProperties: false,
+						properties: {
+							foo: { required: true, node: simpleAndsAndOrs },
+						},
+					},
+				]
+			} );
+		} );
+
+		it( "inside an object w/ additionalProperties", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'o',
+						type: 'object',
+						additionalProperties: bloatedAndsAndOrs,
+						properties: {
+							foo: { required: true, node: bloatedAndsAndOrs },
+						},
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'o',
+						type: 'object',
+						additionalProperties: simpleAndsAndOrs,
+						properties: {
+							foo: { required: true, node: simpleAndsAndOrs },
+						},
+					},
+				]
+			} );
+		} );
+
+		it( "inside an tuple", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'tup',
+						type: 'tuple',
+						additionalItems: false,
+						elementTypes: [ bloatedAndsAndOrs ],
+						minItems: 1,
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'tup',
+						type: 'tuple',
+						additionalItems: false,
+						elementTypes: [ simpleAndsAndOrs ],
+						minItems: 1,
+					},
+				]
+			} );
+		} );
+
+		it( "inside an tuple w/ additionalItems", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'tup',
+						type: 'tuple',
+						additionalItems: bloatedAndsAndOrs,
+						elementTypes: [ bloatedAndsAndOrs ],
+						minItems: 1,
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'tup',
+						type: 'tuple',
+						additionalItems: simpleAndsAndOrs,
+						elementTypes: [ simpleAndsAndOrs ],
+						minItems: 1,
+					},
+				]
+			} );
+		} );
+
+		it( "inside an array", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'arr',
+						type: 'array',
+						elementType: bloatedAndsAndOrs,
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'arr',
+						type: 'array',
+						elementType: simpleAndsAndOrs,
+					},
+				]
+			} );
 		} );
 	} );
 

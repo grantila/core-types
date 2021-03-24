@@ -15,10 +15,9 @@ import { MalformedTypeError } from './error'
 import { mergeAnnotations } from './annotation'
 import { copyName, isNodeDocument, splitTypes } from './util'
 
-export function simplify< T extends NamedType< any > >( node: T )
-: NamedType< any >;
-export function simplify< T extends NamedType< any > >( node: Array< T > )
-: NamedType< any >;
+export function simplify< T extends NamedType >( node: T ): NamedType;
+export function simplify< T extends NamedType >( node: Array< T > )
+: Array< NamedType >;
 export function simplify< T extends NodeType >( node: T ): NodeType;
 export function simplify< T extends NodeType >( node: Array< T > ) : NodeType;
 export function simplify< T extends NodeType >(
@@ -39,7 +38,47 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 
 	const wrapName = ( newNode: NodeType ) => copyName( node, newNode );
 
-	if ( node.type !== 'and' && node.type !== 'or' )
+	if ( node.type === 'tuple' )
+	{
+		return {
+			...node,
+			elementTypes: node.elementTypes.map( type => simplify( type ) ),
+			...(
+				node.additionalItems &&
+					typeof node.additionalItems === 'object'
+				? { additionalItems: simplify( node.additionalItems ) }
+				: { }
+			),
+		};
+	}
+	else if ( node.type === 'array' )
+	{
+		return {
+			...node,
+			elementType: simplify( node.elementType )
+		};
+	}
+	else if ( node.type === 'object' )
+	{
+		return {
+			...node,
+			properties: Object.fromEntries(
+				Object.entries( node.properties )
+				.map( ( [ name, { node, required } ] ) =>
+					[ name, { node: simplify( node ), required } ]
+				)
+			),
+			...(
+				node.additionalProperties &&
+					typeof node.additionalProperties === 'object'
+				? {
+					additionalProperties: simplify( node.additionalProperties )
+				}
+				: { }
+			),
+		};
+	}
+	else if ( node.type !== 'and' && node.type !== 'or' )
 		return wrapName( simplifySingle( node ) );
 	else if ( node.type === 'and' )
 	{
