@@ -12,7 +12,7 @@ import { simplifySingle } from './simplifications/single'
 import { mergeConstEnumUnion } from './simplifications/const-enum'
 import { intersectConstEnum } from './simplifications/intersect-const-enum'
 import { MalformedTypeError } from './error'
-import { mergeAnnotations } from './annotation'
+import { extractAnnotations, mergeAnnotations } from './annotation'
 import { copyName, isNodeDocument, splitTypes } from './util'
 
 export function simplify< T extends NamedType >( node: T ): NamedType;
@@ -95,8 +95,11 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 		);
 
 		if ( and.length === 1 )
-			return wrapName( and[ 0 ] );
-		return wrapName( { type: 'and', and } );
+			return wrapName( {
+				...and[ 0 ],
+				...mergeAnnotations( [ extractAnnotations( node ), and[ 0 ] ] )
+			} );
+		return wrapName( { type: 'and', and, ...extractAnnotations( node ) } );
 	}
 	else if ( node.type === 'or' )
 	{
@@ -113,8 +116,11 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 		);
 
 		if ( or.length === 1 )
-			return wrapName( or[ 0 ] );
-		return wrapName( { type: 'or', or } );
+			return wrapName( {
+				...or[ 0 ],
+				...mergeAnnotations( [ extractAnnotations( node ), or[ 0 ] ] )
+			} );
+		return wrapName( { type: 'or', or, ...extractAnnotations( node ) } );
 	}
 	else
 	{

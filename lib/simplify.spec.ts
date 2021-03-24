@@ -279,6 +279,7 @@ describe( "simplify", ( ) =>
 	{
 		const bloatedAndsAndOrs: OrType = {
 			type: 'or',
+			title: 'Main or',
 			or: [
 				{
 					type: 'or',
@@ -300,6 +301,7 @@ describe( "simplify", ( ) =>
 		};
 		const simpleAndsAndOrs: OrType = {
 			type: 'or',
+			title: 'Main or',
 			or: [
 				{ type: 'string' },
 				{ type: 'number' },
@@ -446,6 +448,48 @@ describe( "simplify", ( ) =>
 						name: 'arr',
 						type: 'array',
 						elementType: simpleAndsAndOrs,
+					},
+				]
+			} );
+		} );
+
+		it( "deep inside an array", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'arr',
+						type: 'array',
+						elementType: {
+							type: 'or',
+							or: [
+								{
+									name: 'tup',
+									type: 'tuple',
+									additionalItems: bloatedAndsAndOrs,
+									elementTypes: [ bloatedAndsAndOrs ],
+									minItems: 1,
+								}
+							]
+						},
+					},
+				]
+			};
+
+			expect( simplify( node ) ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'arr',
+						type: 'array',
+						elementType: {
+							name: 'tup',
+							type: 'tuple',
+							additionalItems: simpleAndsAndOrs,
+							elementTypes: [ simpleAndsAndOrs ],
+							minItems: 1,
+						},
 					},
 				]
 			} );
