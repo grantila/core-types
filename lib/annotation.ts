@@ -84,7 +84,7 @@ export interface StringifyAnnotationsOptions
 	formatWhitespace?: boolean;
 }
 
-function wrapWhitespace( text: string ): string
+export function wrapWhitespace( text: string ): string
 {
 	if ( !text.includes( "\n" ) )
 		return text.startsWith( " " ) ? text : ` ${text}`;
@@ -110,7 +110,8 @@ export function stringifyAnnotations(
 )
 : string
 {
-	const { title, description, examples, default: _default, comment, see } = node;
+	const { title, description, examples, default: _default, comment, see } =
+		node;
 	const fullComment = makeSafeComment(
 		[
 			title,
@@ -213,14 +214,14 @@ export function stripAnnotations< T extends NodeType >(
 	return filteredNode;
 }
 
-function arrayOrSingle< T >( arr: Array< T > ): T | Array< T >
+export function arrayOrSingle< T >( arr: Array< T > ): T | Array< T >
 {
 	if ( arr.length === 1 )
 		return arr[ 0 ];
 	return arr;
 }
 
-function formatExamples( examples: Array< string > ): string
+export function formatExamples( examples: Array< string > ): string
 {
 	const lines =
 		examples.map( example =>
@@ -231,7 +232,7 @@ function formatExamples( examples: Array< string > ): string
 	return lines.trim( );
 }
 
-function formatDefault( _default: string ): string
+export function formatDefault( _default: string ): string
 {
 	const lines = [
 		"@default",
@@ -242,7 +243,7 @@ function formatDefault( _default: string ): string
 	return lines.trim( );
 }
 
-function formatSee( see: Array< string > ): string
+export function formatSee( see: Array< string > ): string
 {
 	const lines =
 		see.map( see => "@see " + stringify( see ) )

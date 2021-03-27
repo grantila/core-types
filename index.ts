@@ -20,6 +20,9 @@ export {
 	stringifyAnnotations,
 	stripAnnotations,
 	stringify,
+	formatExamples,
+	formatDefault,
+	formatSee,
 } from './lib/annotation'
 export {
 	CoreTypesErrorMeta,
