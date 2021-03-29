@@ -42,3 +42,10 @@ export {
 	getPositionOffset,
 	mergeLocations,
 } from './lib/location'
+export {
+	TraverseCallbackArgument,
+	SomeCallback,
+	TraverseCallback,
+	some,
+	traverse,
+} from './lib/traverse'

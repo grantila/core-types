@@ -1,0 +1,291 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`traverse should traverse deeply 1`] = `
+Array [
+  Object {
+    "index": undefined,
+    "parentProperty": undefined,
+    "path": Array [],
+    "required": undefined,
+    "title": "root",
+  },
+  Object {
+    "index": undefined,
+    "parentProperty": "additionalProperties",
+    "path": Array [
+      "additionalProperties",
+    ],
+    "required": undefined,
+    "title": "o-ap",
+  },
+  Object {
+    "index": "and",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "and",
+    ],
+    "required": true,
+    "title": "o-and",
+  },
+  Object {
+    "index": "any",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "any",
+    ],
+    "required": true,
+    "title": "o-any",
+  },
+  Object {
+    "index": "array",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "array",
+    ],
+    "required": false,
+    "title": "o-array",
+  },
+  Object {
+    "index": "boolean",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "boolean",
+    ],
+    "required": true,
+    "title": "o-boolean",
+  },
+  Object {
+    "index": "integer",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "integer",
+    ],
+    "required": false,
+    "title": "o-integer",
+  },
+  Object {
+    "index": "null",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "null",
+    ],
+    "required": true,
+    "title": "o-null",
+  },
+  Object {
+    "index": "number",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "number",
+    ],
+    "required": true,
+    "title": "o-number",
+  },
+  Object {
+    "index": "object",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "object",
+    ],
+    "required": true,
+    "title": "o-object",
+  },
+  Object {
+    "index": "or",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "or",
+    ],
+    "required": true,
+    "title": "o-or",
+  },
+  Object {
+    "index": "ref",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "ref",
+    ],
+    "required": true,
+    "title": "o-ref",
+  },
+  Object {
+    "index": "string",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "string",
+    ],
+    "required": true,
+    "title": "o-string",
+  },
+  Object {
+    "index": "tuple",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "tuple",
+    ],
+    "required": true,
+    "title": "o-tuple",
+  },
+  Object {
+    "index": undefined,
+    "parentProperty": "elementType",
+    "path": Array [
+      "properties",
+      "array",
+      "elementType",
+    ],
+    "required": undefined,
+    "title": "o-array-null",
+  },
+  Object {
+    "index": undefined,
+    "parentProperty": "additionalProperties",
+    "path": Array [
+      "properties",
+      "object",
+      "additionalProperties",
+    ],
+    "required": undefined,
+    "title": "o-o-ap",
+  },
+  Object {
+    "index": undefined,
+    "parentProperty": "additionalItems",
+    "path": Array [
+      "properties",
+      "tuple",
+      "additionalItems",
+    ],
+    "required": undefined,
+    "title": "o-tuple-any",
+  },
+  Object {
+    "index": 0,
+    "parentProperty": "and",
+    "path": Array [
+      "properties",
+      "and",
+      "and",
+      0,
+    ],
+    "required": undefined,
+    "title": "o-and-number",
+  },
+  Object {
+    "index": "foo",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "object",
+      "properties",
+      "foo",
+    ],
+    "required": false,
+    "title": "o-o-foo-integer",
+  },
+  Object {
+    "index": 0,
+    "parentProperty": "or",
+    "path": Array [
+      "properties",
+      "or",
+      "or",
+      0,
+    ],
+    "required": undefined,
+    "title": "o-or-number",
+  },
+  Object {
+    "index": 1,
+    "parentProperty": "elementTypes",
+    "path": Array [
+      "properties",
+      "tuple",
+      "elementTypes",
+      1,
+    ],
+    "required": undefined,
+    "title": "o-tuple-0-boolean",
+  },
+  Object {
+    "index": 0,
+    "parentProperty": "elementTypes",
+    "path": Array [
+      "properties",
+      "tuple",
+      "elementTypes",
+      0,
+    ],
+    "required": undefined,
+    "title": "o-tuple-0-number",
+  },
+]
+`;
+
+exports[`traverse should traverse without additionals 1`] = `
+Array [
+  Object {
+    "index": undefined,
+    "parentProperty": undefined,
+    "path": Array [],
+    "required": undefined,
+    "title": "",
+  },
+  Object {
+    "index": "p",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "p",
+    ],
+    "required": false,
+    "title": "{\\"type\\":\\"object\\",\\"properties\\":{\\"foo\\":{\\"required\\":true,\\"node\\":{\\"type\\":\\"boolean\\"}}},\\"additionalProperties\\":false}",
+  },
+  Object {
+    "index": "tup",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "tup",
+    ],
+    "required": true,
+    "title": "{\\"type\\":\\"tuple\\",\\"elementTypes\\":[{\\"type\\":\\"null\\"}],\\"minItems\\":0,\\"additionalItems\\":false}",
+  },
+  Object {
+    "index": "foo",
+    "parentProperty": "properties",
+    "path": Array [
+      "properties",
+      "p",
+      "properties",
+      "foo",
+    ],
+    "required": true,
+    "title": "{\\"type\\":\\"boolean\\"}",
+  },
+  Object {
+    "index": 0,
+    "parentProperty": "elementTypes",
+    "path": Array [
+      "properties",
+      "tup",
+      "elementTypes",
+      0,
+    ],
+    "required": undefined,
+    "title": "{\\"type\\":\\"null\\"}",
+  },
+]
+`;

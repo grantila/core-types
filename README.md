@@ -16,6 +16,8 @@ Using core-types, e.g. implementing conversions to other type systems is easy, s
  * [Usage](#usage)
    * [simplify](#simplify) types, merge, flatten and remove unncessary types
    * [validate](#validate) types
+   * [traverse](#traverse) type tree
+   * [some](#some) *"Array.prototype.some"* for a type tree
    * [helpers](#helpers) for package implementors
  * [Specification](#specification) of the types in this package are:
    * [any](#any-type) (any of the below types)
@@ -92,6 +94,48 @@ It ensures e.g.
 import { validate } from 'core-types'
 
 validate( myType ); // Throws error if not valid
+```
+
+
+## traverse
+
+The `traverse` function traverses a type tree and calls a callback function for every node it finds.
+
+The callback function gets an object as argument on the following form:
+
+```ts
+interface TraverseCallbackArgument
+{
+	node: NodeType;
+	rootNode: NodeType;
+	path: Array< string | number >;
+	parentProperty?: string;
+	parentNode?: NodeType;
+	index?: string | number;
+	required?: boolean;
+}
+```
+
+```ts
+import { traverse } from 'core-types'
+
+traverse( rootNode, ( { node } ) => {
+	if ( !node.title )
+		node.title = "This is a dummy title";
+} );
+```
+
+
+## some
+
+The `some` function is similar to `traverse` but the callback can return a boolean. If the callback returns true, `some` returns true, otherwise false.
+
+This is useful to quickly find if a node satisifes a certain criteria, and is similar to `Array.prototype.some`.
+
+```ts
+import { some } from 'core-types'
+
+const hasRefNode = some( rootNode, ( { node: { type } } ) => type === 'ref' );
 ```
 
 
