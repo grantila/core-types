@@ -1,6 +1,7 @@
 import {
 	CoreTypesError,
 	MalformedTypeError,
+	MissingReferenceError,
 	UnsupportedError,
 	RelatedError,
 	throwUnsupportedError,
@@ -33,6 +34,17 @@ describe( "errors", ( ) =>
 		{
 			const err = new MalformedTypeError( "msg", { blob: { foo: 42 } } );
 			expect( err.message ).toEqual( "msg" );
+			expect( err.blob ).toStrictEqual( { foo: 42 } );
+		} );
+	} );
+
+	describe( "MissingReferenceError", ( ) =>
+	{
+		it( "should contain the blob", ( ) =>
+		{
+			const err =
+				new MissingReferenceError( "MyType", { blob: { foo: 42 } } );
+			expect( err.message ).toMatch( /missing.*MyType/ );
 			expect( err.blob ).toStrictEqual( { foo: 42 } );
 		} );
 	} );

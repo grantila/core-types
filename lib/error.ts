@@ -43,6 +43,15 @@ export class MalformedTypeError extends CoreTypesError
 	}
 }
 
+export class MissingReferenceError extends CoreTypesError
+{
+	constructor( ref: string, meta: CoreTypesErrorMeta = { } )
+	{
+		super( `Refernce to missing type "${ref}"`, meta );
+		Object.setPrototypeOf( this, MissingReferenceError.prototype );
+	}
+}
+
 export class UnsupportedError extends CoreTypesError
 {
 	constructor( message: string, meta: CoreTypesErrorMeta = { } )

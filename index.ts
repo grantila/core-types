@@ -27,6 +27,7 @@ export {
 export {
 	CoreTypesErrorMeta,
 	MalformedTypeError,
+	MissingReferenceError,
 	UnsupportedError,
 	RelatedError,
 	WarnFunction,
