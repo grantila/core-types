@@ -47,7 +47,7 @@ export class MissingReferenceError extends CoreTypesError
 {
 	constructor( ref: string, meta: CoreTypesErrorMeta = { } )
 	{
-		super( `Refernce to missing type "${ref}"`, meta );
+		super( `Reference to missing type "${ref}"`, meta );
 		Object.setPrototypeOf( this, MissingReferenceError.prototype );
 	}
 }
