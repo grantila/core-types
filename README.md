@@ -38,7 +38,12 @@ The above describes JSON completely, and is a lowest common denominator for desc
 
 # See
 
-This package is used by [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] (converting to and from JSON Schema / Open API), [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] (converting to and from TypeScript types/interfaces) and [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] (converting to and from GraphQL) hence implicitly [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] (conversion between JSON Schema, TypeScript, GraphQL and Open API through core-types).
+This package is used by:
+ * [`core-types-json-schema`][core-types-json-schema-github-url] [![npmjs][core-types-json-schema-npm-image]][core-types-json-schema-npm-url] converting to and from JSON Schema / Open API
+ * [`core-types-ts`][core-types-ts-github-url] [![npmjs][core-types-ts-npm-image]][core-types-ts-npm-url] converting to and from TypeScript types/interfaces
+ * [`core-types-graphql`][core-types-graphql-github-url] [![npmjs][core-types-graphql-npm-image]][core-types-graphql-npm-url] converting to and from GraphQL
+ * [`core-types-suretype`][core-types-suretype-github-url]  [![npmjs][core-types-suretype-npm-image]][core-types-suretype-npm-url] converting to and from SureType validator schemas
+ * [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] conversion between JSON Schema, TypeScript, GraphQL and Open API through core-types
 
 
 # Usage
@@ -449,6 +454,9 @@ Example:
 [core-types-ts-npm-image]: https://img.shields.io/npm/v/core-types-ts.svg
 [core-types-ts-npm-url]: https://npmjs.org/package/core-types-ts
 [core-types-ts-github-url]: https://github.com/grantila/core-types-ts
+[core-types-suretype-npm-image]: https://img.shields.io/npm/v/core-types-suretype.svg
+[core-types-suretype-npm-url]: https://npmjs.org/package/core-types-suretype
+[core-types-suretype-github-url]: https://github.com/grantila/core-types-suretype
 [core-types-graphql-npm-image]: https://img.shields.io/npm/v/core-types-graphql.svg
 [core-types-graphql-npm-url]: https://npmjs.org/package/core-types-graphql
 [core-types-graphql-github-url]: https://github.com/grantila/core-types-graphql
