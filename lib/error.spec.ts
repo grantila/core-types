@@ -13,7 +13,7 @@ import {
 } from './error'
 
 
-const catchError = ( thrower: ( ) => any ): CoreTypesError =>
+const catchError = < T = CoreTypesError >( thrower: ( ) => any ): T =>
 	{
 		try
 		{
@@ -21,7 +21,7 @@ const catchError = ( thrower: ( ) => any ): CoreTypesError =>
 		}
 		catch ( err )
 		{
-			return err;
+			return err as T;
 		}
 		throw new Error( "No error thrown" );
 	}
@@ -105,13 +105,13 @@ describe( "errors", ( ) =>
 	{
 		it( "should be true for CoreTypesErrors", ( ) =>
 		{
-			const err1 = catchError(
+			const err1 = catchError< unknown >(
 				( ) => throwUnsupportedError( "foo", { type: 'string' } )
 			);
 			expect( isCoreTypesError( err1 ) ).toBe( true );
 
-			const err2 = catchError(
-				( ) => throwRelatedError( err1 )
+			const err2 = catchError< unknown >(
+				( ) => throwRelatedError( err1 as CoreTypesError )
 			);
 			expect( isCoreTypesError( err2 ) ).toBe( true );
 		} );

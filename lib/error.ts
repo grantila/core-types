@@ -96,7 +96,7 @@ export function throwRelatedError(
 	throw new RelatedError( err, meta );
 }
 
-export function isCoreTypesError( err: Error | CoreTypesError )
+export function isCoreTypesError( err: unknown | Error | CoreTypesError )
 : err is CoreTypesError
 {
 	return err instanceof CoreTypesError;
