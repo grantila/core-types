@@ -6,7 +6,8 @@ import {
 	NodeTypeMap,
 	NamedType,
 	NodeDocument,
-	BooleanType,
+	TypeMap,
+	NodeWithConstEnum,
 } from './types'
 import { simplifySingle } from './simplifications/single'
 import { mergeConstEnumUnion } from './simplifications/const-enum'
@@ -15,11 +16,27 @@ import { MalformedTypeError } from './error'
 import { extractAnnotations, mergeAnnotations } from './annotation'
 import {
 	copyName,
+	firstSplitTypeIndex,
 	flattenSplitTypeValues,
 	isNodeDocument,
 	NodeWithOrder,
 	splitTypes,
 } from './util'
+
+
+const enumableTypeNames = [
+	'any',
+	'string',
+	'number',
+	'integer',
+	'boolean',
+	'ref',
+	// These would be handy too, but will only work for types without other
+	// specifyers too (items, additionalItems, properties, ...):
+	// 'object',
+	// 'array',
+	// 'tuple',
+];
 
 export function simplify< T extends NamedType >( node: T ): NamedType;
 export function simplify< T extends NamedType >( node: Array< T > )
@@ -155,31 +172,38 @@ function simplifyUnion( nodes: Array< NodeType > ): Array< NodeType >
 			} ];
 	}
 
-	if ( typeMap.boolean.length === 1 )
-		typeMap.boolean = [ {
-			node: simplifySingle( typeMap.boolean[ 0 ].node ) as BooleanType,
-			order: typeMap.boolean[ 0 ].order,
-		} ];
-	else if ( typeMap.boolean.length > 1 )
+	for ( const [ _typeName, _types ] of Object.entries( typeMap ) )
 	{
-		const bools = mergeConstEnumUnion(
-			typeMap.boolean.map( ( { node } ) => node )
-		);
-		if ( bools.length === 0 )
-			// This enum/const can be removed in favor of generic boolean
-			typeMap.boolean = [ {
-				node: { type: 'boolean' },
-				order: Math.min(
-					...typeMap.boolean.map( ( { order } ) => order )
-				),
+		type ThisType = Array< NodeWithOrder< NodeWithConstEnum > >;
+
+		const typeName = _typeName as keyof TypeMap;
+
+		if ( !enumableTypeNames.includes( typeName ) || !_types.length )
+			continue;
+
+		const orderedTypes =
+			_types as NodeWithOrder< NodeWithConstEnum >[ ];
+
+		const types = orderedTypes.map( ( { node } ) => node );
+
+		const merged = mergeConstEnumUnion( types );
+
+		if ( merged.length === 0 )
+			( typeMap[ typeName ] as ThisType ) = [ {
+				node: {
+					type: typeName,
+					...mergeAnnotations( types ),
+				} as NodeWithConstEnum,
+				order: firstSplitTypeIndex( orderedTypes ),
 			} ];
 		else
-			typeMap.boolean = [ {
-				node: simplifySingle( { type: 'boolean', enum: bools } ) as
-					BooleanType,
-				order: Math.min(
-					...typeMap.boolean.map( ( { order } ) => order )
-				),
+			( typeMap[ typeName ] as ThisType ) = [ {
+				node: simplifySingle( {
+					type: typeName,
+					enum: merged,
+					...mergeAnnotations( types ),
+				} as NodeWithConstEnum ),
+				order: firstSplitTypeIndex( orderedTypes ),
 			} ];
 	}
 
@@ -227,18 +251,13 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 		< T extends Types >( nodes: Array< NodeWithOrder< unknown > > ) =>
 			nodes.map( ( { node } ) => node ) as Array< NodeTypeMap[ T ] >;
 
-
-	const firstIndex =
-		< T extends Types >( nodes: Array< NodeWithOrder< unknown > > ) =>
-			Math.min( ...nodes.map( ( { order } ) => order ) );
-
 	if ( typeMap.boolean.length > 1 )
 		typeMap.boolean = [ {
 			node: intersectConstEnum( [
 				...typeMap.boolean.map( ( { node } ) => node ),
 				...cast< 'boolean' >( typeMap.any ),
 			] ),
-			order: firstIndex( typeMap.boolean ),
+			order: firstSplitTypeIndex( typeMap.boolean ),
 		} ];
 
 	if ( typeMap.string.length > 1 )
@@ -247,7 +266,7 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 				...typeMap.string.map( ( { node } ) => node ),
 				...cast< 'string' >( typeMap.any ),
 			] ),
-			order: firstIndex( typeMap.string ),
+			order: firstSplitTypeIndex( typeMap.string ),
 		} ];
 
 	if ( typeMap.number.length > 0 && typeMap.integer.length > 0 )
@@ -258,7 +277,7 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 				...cast< 'number' >( typeMap.integer ),
 				...cast< 'number' >( typeMap.any ),
 			] ),
-			order: firstIndex( typeMap.number ),
+			order: firstSplitTypeIndex( typeMap.number ),
 		} ];
 		typeMap.integer = [ ];
 	}
@@ -268,7 +287,7 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 				...typeMap.number.map( ( { node } ) => node ),
 				...cast< 'number' >( typeMap.any ),
 			] ),
-			order: firstIndex( typeMap.number ),
+			order: firstSplitTypeIndex( typeMap.number ),
 		} ];
 	else if ( typeMap.integer.length > 1 )
 		typeMap.integer = [ {
@@ -276,7 +295,7 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 				...typeMap.integer.map( ( { node } ) => node ),
 				...cast< 'integer' >( typeMap.any ),
 			] ),
-			order: firstIndex( typeMap.integer ),
+			order: firstSplitTypeIndex( typeMap.integer ),
 		} ];
 
 	if ( typeMap.or.length > 0 )

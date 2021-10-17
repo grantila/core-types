@@ -195,6 +195,11 @@ export function flattenSplitTypeValues( splitTypes: SplitTypes )
 	);
 }
 
+export function firstSplitTypeIndex( nodes: Array< NodeWithOrder< unknown > > )
+{
+	return Math.min( ...nodes.map( ( { order } ) => order ) );
+}
+
 export function copyName( from: NamedType< any >, to: NamedType< any > )
 : typeof to
 {

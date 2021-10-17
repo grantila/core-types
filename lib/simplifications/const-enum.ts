@@ -10,7 +10,7 @@ import { Comparable, uniq } from '../util'
 export function simplifyEnumAndConst< T extends NodeType, U >(
 	node: T & GenericTypeInfo< U >
 )
-: NodeType & GenericTypeInfo< U >
+: T & GenericTypeInfo< U >
 {
 	const { const: _const, enum: _enum, ...rest } = node;
 	type ItemType = UnknownAsComparable< TypeMap[ T[ 'type' ] ] >;
@@ -19,10 +19,10 @@ export function simplifyEnumAndConst< T extends NodeType, U >(
 		combineConstAndEnum( node as GenericTypeInfo< ItemType > );
 
 	if ( combined.length === 0 )
-		return rest as NodeType & GenericTypeInfo< U >;
+		return rest as T & GenericTypeInfo< U >;
 	else if ( combined.length === 1 )
 		return { ...( rest as typeof node ), const: combined[ 0 ] } as
-			NodeType & GenericTypeInfo< U >;
+			T & GenericTypeInfo< U >;
 	else
 	{
 		if (
@@ -33,10 +33,9 @@ export function simplifyEnumAndConst< T extends NodeType, U >(
 			( combined as Array< unknown > ).includes( true )
 		)
 			// This enum can be removed in favor of generic boolean
-			return { ...rest } as NodeType & GenericTypeInfo< U >;
+			return { ...rest } as T & GenericTypeInfo< U >;
 		else
-			return { ...rest, enum: combined } as
-				NodeType & GenericTypeInfo< U >;
+			return { ...rest, enum: combined } as T & GenericTypeInfo< U >;
 	}
 }
 

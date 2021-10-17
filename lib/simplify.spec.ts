@@ -646,6 +646,131 @@ describe( "simplify", ( ) =>
 		} );
 	} );
 
+	it( "or types with multiple const of same type (become enum)", ( ) =>
+	{
+		const node: NodeType = {
+			type: 'or',
+			or: [
+				{
+					type: 'string',
+					const: 'foo',
+				},
+				{
+					type: 'and',
+					and: [
+						{
+							type: 'number',
+							const: 42,
+						}
+					]
+				},
+				{
+					type: 'or',
+					or: [
+						{
+							type: 'string',
+							const: 'bar',
+						}
+					]
+				},
+			]
+		};
+		const result = simplify( node );
+
+		expect( result ).toStrictEqual( {
+			type: 'or',
+			or: [
+				{
+					type: 'string',
+					enum: [ 'foo', 'bar' ],
+				},
+				{
+					type: 'number',
+					const: 42,
+				},
+			]
+		} );
+	} );
+
+	it( "or types with multiple const or enum (become enum)", ( ) =>
+	{
+		const node: NodeType = {
+			type: 'or',
+			or: [
+				{
+					type: 'string',
+					const: 'foo',
+				},
+				{
+					type: 'and',
+					and: [
+						{
+							type: 'string',
+							enum: [ 'bar', 'baz' ],
+						}
+					]
+				},
+				{
+					type: 'or',
+					or: [
+						{
+							type: 'string',
+							const: 'bak',
+						}
+					]
+				},
+			]
+		};
+		const result = simplify( node );
+
+		expect( result ).toStrictEqual( {
+			type: 'string',
+			enum: [ 'foo', 'bar', 'baz', 'bak' ],
+		} );
+	} );
+
+	it( "or types with const/enum and generic (become generic)", ( ) =>
+	{
+		const node: NodeType = {
+			type: 'or',
+			or: [
+				{
+					type: 'string',
+					const: 'foo',
+					description: 'this is a foo'
+				},
+				{
+					type: 'and',
+					and: [
+						{
+							type: 'string',
+							enum: [ 'bar', 'baz' ],
+							title: 'this has a title',
+							description: 'and a bar-baz description',
+						}
+					]
+				},
+				{
+					type: 'or',
+					or: [
+						{
+							type: 'string',
+							see: 'me',
+						}
+					]
+				},
+			]
+		};
+		const result = simplify( node );
+
+		expect( result ).toStrictEqual( {
+			type: 'string',
+			description: 'this is a foo\nand a bar-baz description',
+			title: 'this has a title',
+			see: 'me',
+		} );
+	} );
+
 	it( "maintain or-order", ( ) =>
 	{
 		const node1: NodeType = {
