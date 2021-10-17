@@ -13,7 +13,13 @@ import { mergeConstEnumUnion } from './simplifications/const-enum'
 import { intersectConstEnum } from './simplifications/intersect-const-enum'
 import { MalformedTypeError } from './error'
 import { extractAnnotations, mergeAnnotations } from './annotation'
-import { copyName, isNodeDocument, splitTypes } from './util'
+import {
+	copyName,
+	flattenSplitTypeValues,
+	isNodeDocument,
+	NodeWithOrder,
+	splitTypes,
+} from './util'
 
 export function simplify< T extends NamedType >( node: T ): NamedType;
 export function simplify< T extends NamedType >( node: Array< T > )
@@ -137,37 +143,54 @@ function simplifyUnion( nodes: Array< NodeType > ): Array< NodeType >
 
 	if ( typeMap.any.length > 0 )
 	{
-		const enums = mergeConstEnumUnion( typeMap.any );
+		const enums = mergeConstEnumUnion(
+			typeMap.any.map( ( { node } ) => node )
+		);
 		if ( enums.length === 0 )
 			// If any type in a set of types is an "any" type, without const
 			// or enum, the whole union is "any".
-			return [ { type: 'any', ...mergeAnnotations( typeMap.any ) } ];
+			return [ {
+				type: 'any',
+				...mergeAnnotations( typeMap.any.map( ( { node } ) => node ) ),
+			} ];
 	}
 
 	if ( typeMap.boolean.length === 1 )
-		typeMap.boolean = [
-			simplifySingle( typeMap.boolean[ 0 ] ) as BooleanType
-		];
+		typeMap.boolean = [ {
+			node: simplifySingle( typeMap.boolean[ 0 ].node ) as BooleanType,
+			order: typeMap.boolean[ 0 ].order,
+		} ];
 	else if ( typeMap.boolean.length > 1 )
 	{
-		const bools = mergeConstEnumUnion( typeMap.boolean );
+		const bools = mergeConstEnumUnion(
+			typeMap.boolean.map( ( { node } ) => node )
+		);
 		if ( bools.length === 0 )
 			// This enum/const can be removed in favor of generic boolean
-			typeMap.boolean = [ { type: 'boolean' } ];
+			typeMap.boolean = [ {
+				node: { type: 'boolean' },
+				order: Math.min(
+					...typeMap.boolean.map( ( { order } ) => order )
+				),
+			} ];
 		else
-			typeMap.boolean = [
-				simplifySingle( { type: 'boolean', enum: bools } ) as
-					BooleanType
-			];
+			typeMap.boolean = [ {
+				node: simplifySingle( { type: 'boolean', enum: bools } ) as
+					BooleanType,
+				order: Math.min(
+					...typeMap.boolean.map( ( { order } ) => order )
+				),
+			} ];
 	}
 
 	if ( typeMap.or.length > 0 )
-		typeMap.or = typeMap.or.filter( ( { or } ) => or.length > 0 );
+		typeMap.or = typeMap.or.filter( ( { node } ) => node.or.length > 0 );
 
 	if ( typeMap.and.length > 0 )
-		typeMap.and = typeMap.and.filter( ( { and } ) => and.length > 0 );
+		typeMap.and = typeMap.and
+			.filter( ( { node } ) => node.and.length > 0 );
 
-	return ( [ ] as Array< NodeType > ).concat( ...Object.values( typeMap ) );
+	return flattenSplitTypeValues( typeMap );
 }
 
 // Combine types/nodes and exclude types, const and enum where other are
@@ -191,52 +214,77 @@ function simplifyIntersection( nodes: Array< NodeType > ): Array< NodeType >
 			typeMap.array.length === 0 &&
 			typeMap.tuple.length === 0
 		)
-			return [ { type: 'any', ...mergeAnnotations( typeMap.any ) } ];
+			return [ {
+				type: 'any',
+				...mergeAnnotations( typeMap.any.map( ( { node } ) => node ) ),
+			} ];
 		else
 			// A more precise type will supercede this
 			typeMap.any = [ ];
 	}
 
-	const cast = < T extends Types >( nodes: Array< unknown > ) =>
-		nodes as Array< NodeTypeMap[ T ] >;
+	const cast =
+		< T extends Types >( nodes: Array< NodeWithOrder< unknown > > ) =>
+			nodes.map( ( { node } ) => node ) as Array< NodeTypeMap[ T ] >;
+
+
+	const firstIndex =
+		< T extends Types >( nodes: Array< NodeWithOrder< unknown > > ) =>
+			Math.min( ...nodes.map( ( { order } ) => order ) );
 
 	if ( typeMap.boolean.length > 1 )
-		typeMap.boolean = [ intersectConstEnum( [
-			...typeMap.boolean,
-			...cast< 'boolean' >( typeMap.any ),
-		] ) ];
+		typeMap.boolean = [ {
+			node: intersectConstEnum( [
+				...typeMap.boolean.map( ( { node } ) => node ),
+				...cast< 'boolean' >( typeMap.any ),
+			] ),
+			order: firstIndex( typeMap.boolean ),
+		} ];
 
 	if ( typeMap.string.length > 1 )
-		typeMap.string = [ intersectConstEnum( [
-			...typeMap.string,
-			...cast< 'string' >( typeMap.any ),
-		] ) ];
+		typeMap.string = [ {
+			node: intersectConstEnum( [
+				...typeMap.string.map( ( { node } ) => node ),
+				...cast< 'string' >( typeMap.any ),
+			] ),
+			order: firstIndex( typeMap.string ),
+		} ];
 
 	if ( typeMap.number.length > 0 && typeMap.integer.length > 0 )
 	{
-		typeMap.number = [ intersectConstEnum( [
-			...typeMap.number,
-			...cast< 'number' >( typeMap.integer ),
-			...cast< 'number' >( typeMap.any ),
-		] ) ];
+		typeMap.number = [ {
+			node: intersectConstEnum( [
+				...typeMap.number.map( ( { node } ) => node ),
+				...cast< 'number' >( typeMap.integer ),
+				...cast< 'number' >( typeMap.any ),
+			] ),
+			order: firstIndex( typeMap.number ),
+		} ];
 		typeMap.integer = [ ];
 	}
 	else if ( typeMap.number.length > 1 )
-		typeMap.number = [ intersectConstEnum( [
-			...typeMap.number,
-			...cast< 'number' >( typeMap.any ),
-		] ) ];
+		typeMap.number = [ {
+			node: intersectConstEnum( [
+				...typeMap.number.map( ( { node } ) => node ),
+				...cast< 'number' >( typeMap.any ),
+			] ),
+			order: firstIndex( typeMap.number ),
+		} ];
 	else if ( typeMap.integer.length > 1 )
-		typeMap.integer = [ intersectConstEnum( [
-			...typeMap.integer,
-			...cast< 'integer' >( typeMap.any ),
-		] ) ];
+		typeMap.integer = [ {
+			node: intersectConstEnum( [
+				...typeMap.integer.map( ( { node } ) => node ),
+				...cast< 'integer' >( typeMap.any ),
+			] ),
+			order: firstIndex( typeMap.integer ),
+		} ];
 
 	if ( typeMap.or.length > 0 )
-		typeMap.or = typeMap.or.filter( ( { or } ) => or.length > 0 );
+		typeMap.or = typeMap.or.filter( ( { node } ) => node.or.length > 0 );
 
 	if ( typeMap.and.length > 0 )
-		typeMap.and = typeMap.and.filter( ( { and } ) => and.length > 0 );
+		typeMap.and = typeMap.and
+			.filter( ( { node } ) => node.and.length > 0 );
 
-	return ( [ ] as Array< NodeType > ).concat( ...Object.values( typeMap ) );
+	return flattenSplitTypeValues( typeMap );
 }

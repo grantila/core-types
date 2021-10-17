@@ -136,7 +136,15 @@ export function union< T extends Comparable >(
 	return ret;
 }
 
-type SplitTypes = { [ T in Types ]: Array< NodeTypeMap[ T ] >; };
+export interface NodeWithOrder< T >
+{
+	node: T;
+	order: number;
+}
+
+type SplitTypes = {
+	[ T in Types ]: Array< NodeWithOrder< NodeTypeMap[ T ] > >;
+};
 
 // Split a set of types into individual sets per-type
 export function splitTypes( nodes: Array< NodeType > ): SplitTypes
@@ -156,7 +164,7 @@ export function splitTypes( nodes: Array< NodeType > ): SplitTypes
 		tuple: [ ],
 	};
 
-	nodes.forEach( node =>
+	nodes.forEach( ( node, index ) =>
 	{
 		if (
 			node.type !== 'and' && node.type !== 'or'
@@ -165,10 +173,26 @@ export function splitTypes( nodes: Array< NodeType > ): SplitTypes
 			||
 			node.type === 'or' && node.or.length > 0
 		)
-			ret[ node.type ].push( node as any );
+		{
+			const nodeWithOrder: NodeWithOrder< typeof node > = {
+				node,
+				order: index,
+			};
+			ret[ node.type ].push( nodeWithOrder as any );
+		}
 	} );
 
 	return ret;
+}
+
+export function flattenSplitTypeValues( splitTypes: SplitTypes )
+{
+	return ( [ ] as Array< NodeType > ).concat(
+		Object.values( splitTypes )
+		.flat( )
+		.sort( ( a, b ) => a.order - b.order )
+		.map( ( { node } ) => node )
+	);
 }
 
 export function copyName( from: NamedType< any >, to: NamedType< any > )
