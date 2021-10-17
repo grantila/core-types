@@ -30,12 +30,6 @@ const enumableTypeNames = [
 	'number',
 	'integer',
 	'boolean',
-	'ref',
-	// These would be handy too, but will only work for types without other
-	// specifyers too (items, additionalItems, properties, ...):
-	// 'object',
-	// 'array',
-	// 'tuple',
 ];
 
 export function simplify< T extends NamedType >( node: T ): NamedType;

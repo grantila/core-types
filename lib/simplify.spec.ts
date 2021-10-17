@@ -67,6 +67,37 @@ describe( "simplify", ( ) =>
 		} );
 	} );
 
+	it( "union of refs", ( ) =>
+	{
+		const result = simplify( {
+			type: 'or',
+			or: [
+				{
+					type: 'ref',
+					ref: 'foo',
+				},
+				{
+					type: 'ref',
+					ref: 'bar',
+				},
+			]
+		} );
+
+		expect( result ).toStrictEqual( {
+			type: 'or',
+			or: [
+				{
+					type: 'ref',
+					ref: 'foo',
+				},
+				{
+					type: 'ref',
+					ref: 'bar',
+				},
+			]
+		} );
+	} );
+
 	it( "bool union true and false", ( ) =>
 	{
 		const result = simplify( {
