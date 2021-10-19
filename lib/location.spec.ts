@@ -89,5 +89,22 @@ describe( "location", ( ) =>
 				] )
 			).toStrictEqual( { start: 3, end: 4 } );
 		} );
+
+		it( "should pick lowest start and highest end", ( ) =>
+		{
+			expect(
+				mergeLocations( [
+					undefined,
+					{
+						start: 5,
+						end: 10,
+					},
+					{
+						start: 7,
+						end: 12,
+					}
+				] )
+			).toStrictEqual( { start: 5, end: 12 } );
+		} );
 	} );
 } );

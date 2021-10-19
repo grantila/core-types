@@ -101,7 +101,7 @@ export function mergeLocations(
 					&&
 					high.location === startOffset
 					||
-					high.offset > endOffset
+					high.offset < endOffset
 				)
 					high = {
 						location: end,
