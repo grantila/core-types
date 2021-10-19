@@ -1,29 +1,31 @@
-import { mergeLocations } from "./location";
+import { mergeLocations } from "./location"
 import type { CoreTypeAnnotations, NodeType } from "./types"
-import { ensureArray } from "./util"
+import { ensureArray, uniq } from "./util"
 
 
 export function mergeAnnotations( nodes: Array< CoreTypeAnnotations > )
 : CoreTypeAnnotations
 {
 	const nonEmpty = < T >( t: T ): t is NonNullable< T > => !!t;
-	const join = < T >( t: Array< T > ) =>
-		t.filter( nonEmpty ).join( "\n" ).trim( );
+	const join = < T >( t: Array< T >, separator = '\n' ) =>
+		uniq( t.filter( nonEmpty ) ).join( separator ).trim( );
 
 	const name = nodes.find( n => n.name )?.name;
-	const title = join( nodes.map( n => n.title ) );
+	const title = join( nodes.map( n => n.title ), ', ' );
 	const description = join( nodes.map( n => n.description ) );
-	const examples =
+	const examples = uniq(
 		( [ ] as Array< string > ).concat(
 			...nodes.map( n => ensureArray( n.examples ) )
 		)
-		.filter( nonEmpty );
+		.filter( nonEmpty )
+	);
 	const _default = join( nodes.map( n => n.default ) );
-	const see =
+	const see = uniq(
 		( [ ] as Array< string > ).concat(
 			...nodes.map( n => ensureArray( n.see ) )
 		)
-		.filter( nonEmpty );
+		.filter( nonEmpty )
+	);
 	const comment = join( nodes.map( n => n.comment ) );
 	const loc = mergeLocations( nodes.map( n => n.loc ) );
 

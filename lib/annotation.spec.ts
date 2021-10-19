@@ -1,4 +1,5 @@
 import {
+	mergeAnnotations,
 	wrapWhitespace,
 	arrayOrSingle,
 	stripAnnotations,
@@ -7,8 +8,85 @@ import {
 import { CoreTypeAnnotations, NodeType, ObjectProperty } from "./types"
 
 
+const exampleAnnotation1: Readonly< CoreTypeAnnotations > = Object.freeze( {
+	title: 'foo',
+	comment: 'comment',
+	description: 'description',
+	default: 'def',
+	examples: [ 'these', 'are', 'examples' ],
+	loc: { start: 17, end: 42 },
+	name: 'name',
+	see: 'see this',
+} );
+
+const exampleAnnotation2: Readonly< CoreTypeAnnotations > = Object.freeze( {
+	title: 'bar',
+	comment: 'comment2',
+	description: 'description2',
+	default: 'def2',
+	examples: [ 'more', 'examples', 'yay' ],
+	loc: { start: 32, end: 64 },
+	name: 'name2',
+	see: 'see this too',
+} );
+
 describe( "annotation", ( ) =>
 {
+	describe( "mergeAnnotations", ( ) =>
+	{
+		it ( "should handle empty array", ( ) =>
+		{
+			expect( mergeAnnotations( [ ] ) ).toStrictEqual( { } );
+		} );
+
+		it ( "should handle empty documents", ( ) =>
+		{
+			expect( mergeAnnotations( [ { } ] ) ).toStrictEqual( { } );
+		} );
+
+		it ( "should handle one non-empty document", ( ) =>
+		{
+			expect( mergeAnnotations( [ exampleAnnotation1 ] ) )
+				.toStrictEqual( exampleAnnotation1 );
+		} );
+
+		it ( "should handle one empty and one non-empty document", ( ) =>
+		{
+			expect( mergeAnnotations( [ { }, exampleAnnotation1 ] ) )
+				.toStrictEqual( exampleAnnotation1 );
+		} );
+
+		it ( "should handle two identical documents", ( ) =>
+		{
+			expect(
+				mergeAnnotations( [ exampleAnnotation1, exampleAnnotation1 ] )
+			)
+				.toStrictEqual( exampleAnnotation1 );
+				exampleAnnotation2;
+		} );
+
+		it ( "should handle two non-identical documents", ( ) =>
+		{
+			const ex1 = exampleAnnotation1;
+			const ex2 = exampleAnnotation2;
+			expect(
+				mergeAnnotations( [ ex1, ex2 ] )
+			)
+				.toStrictEqual( {
+					title: `${ex1.title}, ${ex2.title}`,
+					comment: `${ex1.comment}\n${ex2.comment}`,
+					description: `${ex1.description}\n${ex2.description}`,
+					default: `${ex1.default}\n${ex2.default}`,
+					examples: [ ...new Set( [
+						...ex1.examples as any[], ...ex2.examples as any[]
+					] ) ],
+					see: [ ex1.see, ex2.see ],
+					name: 'name',
+					loc: { start: 17, end: 64 },
+				} as CoreTypeAnnotations );
+		} );
+	} );
+
 	describe( "wrapWhitespace", ( ) =>
 	{
 		it ( "should handle empty comment", ( ) =>

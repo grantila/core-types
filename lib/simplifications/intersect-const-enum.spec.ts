@@ -81,7 +81,7 @@ describe( "intersectConstEnum", ( ) =>
 		expect( result ).toStrictEqual( {
 			type: 'string',
 			enum: [ 'foo', 'baz' ],
-			title: 'Foo\nBar',
+			title: 'Foo, Bar',
 			description: 'Bars'
 		} );
 	} );
