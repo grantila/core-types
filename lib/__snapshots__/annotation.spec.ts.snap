@@ -1,9 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`annotation stringifyAnnotations should stringify everything corrently with arrays 1`] = `
-"Title
-
-The description
+"The description
 on multiple lines...
 
 @example
@@ -19,9 +17,7 @@ on multiple lines...
 `;
 
 exports[`annotation stringifyAnnotations should stringify everything corrently with singles 1`] = `
-"Title
-
-The description
+"The description
 on multiple lines...
 
 @example

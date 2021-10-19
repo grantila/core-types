@@ -112,11 +112,9 @@ export function stringifyAnnotations(
 )
 : string
 {
-	const { title, description, examples, default: _default, comment, see } =
-		node;
+	const { description, examples, default: _default, comment, see } = node;
 	const fullComment = makeSafeComment(
 		[
-			title,
 			description,
 			...( examples == undefined ? [ ] : [
 				formatExamples( ensureArray( examples ) )
