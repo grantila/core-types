@@ -2,7 +2,6 @@
 [![downloads][downloads-image]][npm-url]
 [![build status][build-image]][build-url]
 [![coverage status][coverage-image]][coverage-url]
-[![Language grade: JavaScript][lgtm-image]][lgtm-url]
 [![Node.JS version][node-version]][node-url]
 
 
@@ -439,12 +438,10 @@ Example:
 [npm-image]: https://img.shields.io/npm/v/core-types.svg
 [npm-url]: https://npmjs.org/package/core-types
 [downloads-image]: https://img.shields.io/npm/dm/core-types.svg
-[build-image]: https://img.shields.io/github/workflow/status/grantila/core-types/Master.svg
+[build-image]: https://img.shields.io/github/actions/workflow/status/grantila/core-types/master.yml?branch=master
 [build-url]: https://github.com/grantila/core-types/actions?query=workflow%3AMaster
 [coverage-image]: https://coveralls.io/repos/github/grantila/core-types/badge.svg?branch=master
 [coverage-url]: https://coveralls.io/github/grantila/core-types?branch=master
-[lgtm-image]: https://img.shields.io/lgtm/grade/javascript/g/grantila/core-types.svg?logo=lgtm&logoWidth=18
-[lgtm-url]: https://lgtm.com/projects/g/grantila/core-types/context:javascript
 [node-version]: https://img.shields.io/node/v/core-types
 [node-url]: https://nodejs.org/en/
 
