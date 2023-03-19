@@ -2,7 +2,7 @@ import {
 	combineConstAndEnum,
 	mergeConstEnumUnion,
 	simplifyEnumAndConst,
-} from './const-enum'
+} from './const-enum.js'
 
 
 describe( "combineConstAndEnum", ( ) =>

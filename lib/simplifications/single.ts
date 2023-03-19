@@ -1,5 +1,5 @@
-import { NodeType, AndType, OrType } from '../types'
-import { simplifyEnumAndConst } from './const-enum'
+import { NodeType, AndType, OrType } from '../types.js'
+import { simplifyEnumAndConst } from './const-enum.js'
 
 
 export function simplifySingle<

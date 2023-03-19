@@ -45,6 +45,11 @@ This package is used by:
  * [`typeconv`][typeconv-github-url] [![npmjs][typeconv-npm-image]][typeconv-npm-url] conversion between JSON Schema, TypeScript, GraphQL and Open API through core-types
 
 
+# Versions
+
+Since 3.0 this package is pure ESM and requires Node 14.13.1 or later.
+
+
 # Usage
 
 To create a core-types type, just cast it to `NodeType`.

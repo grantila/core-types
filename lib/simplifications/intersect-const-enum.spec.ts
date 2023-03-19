@@ -1,4 +1,4 @@
-import { intersectConstEnum } from './intersect-const-enum'
+import { intersectConstEnum } from './intersect-const-enum.js'
 
 
 describe( "intersectConstEnum", ( ) =>

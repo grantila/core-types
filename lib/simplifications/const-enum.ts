@@ -1,10 +1,10 @@
-import {
-	TypeMap,
+import type {
 	GenericTypeInfo,
 	NodeType,
 	NodeWithConstEnum,
-} from '../types'
-import { Comparable, uniq } from '../util'
+	TypeMap,
+} from '../types.js'
+import { type Comparable, uniq } from '../util.js'
 
 
 export function simplifyEnumAndConst< T extends NodeType, U >(

@@ -1,5 +1,5 @@
-import { MalformedTypeError } from './error'
-import { validate } from './validate'
+import { MalformedTypeError } from './error.js'
+import { validate } from './validate.js'
 
 
 describe( "validate", ( ) =>

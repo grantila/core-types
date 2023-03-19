@@ -1,13 +1,13 @@
-import { NodeType, Types } from './types';
+import type { NodeType, Types } from './types.js'
 import {
-	uniq,
 	ensureArray,
-	isPrimitiveType,
 	hasConstEnum,
-	isEqual,
 	intersection,
+	isEqual,
+	isPrimitiveType,
 	union,
-} from './util'
+	uniq,
+} from './util.js'
 
 
 const nodeify = ( type: Types ): NodeType => ( { type } ) as NodeType;

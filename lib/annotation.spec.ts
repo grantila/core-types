@@ -1,11 +1,11 @@
 import {
-	mergeAnnotations,
-	wrapWhitespace,
 	arrayOrSingle,
-	stripAnnotations,
+	mergeAnnotations,
 	stringifyAnnotations,
-} from "./annotation"
-import { CoreTypeAnnotations, NodeType, ObjectProperty } from "./types"
+	stripAnnotations,
+	wrapWhitespace,
+} from './annotation.js'
+import type { CoreTypeAnnotations, NodeType, ObjectProperty } from './types.js'
 
 
 const exampleAnnotation1: Readonly< CoreTypeAnnotations > = Object.freeze( {

@@ -1,16 +1,16 @@
 import {
-	CoreTypesError,
-	MalformedTypeError,
-	MissingReferenceError,
-	UnsupportedError,
-	RelatedError,
-	throwUnsupportedError,
-	throwRelatedError,
-	isCoreTypesError,
+	type CoreTypesError,
+	type CoreTypesErrorMeta,
 	decorateError,
 	decorateErrorMeta,
-	CoreTypesErrorMeta,
-} from './error'
+	isCoreTypesError,
+	MalformedTypeError,
+	MissingReferenceError,
+	RelatedError,
+	throwRelatedError,
+	throwUnsupportedError,
+	UnsupportedError,
+} from './error.js'
 
 
 const catchError = < T = CoreTypesError >( thrower: ( ) => any ): T =>

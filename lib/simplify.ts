@@ -1,19 +1,19 @@
-import {
-	NodeType,
+import type {
 	AndType,
-	OrType,
-	Types,
-	NodeTypeMap,
 	NamedType,
 	NodeDocument,
-	TypeMap,
+	NodeType,
+	NodeTypeMap,
 	NodeWithConstEnum,
-} from './types'
-import { simplifySingle } from './simplifications/single'
-import { mergeConstEnumUnion } from './simplifications/const-enum'
-import { intersectConstEnum } from './simplifications/intersect-const-enum'
-import { MalformedTypeError } from './error'
-import { extractAnnotations, mergeAnnotations } from './annotation'
+	OrType,
+	TypeMap,
+	Types,
+} from './types.js'
+import { simplifySingle } from './simplifications/single.js'
+import { mergeConstEnumUnion } from './simplifications/const-enum.js'
+import { intersectConstEnum } from './simplifications/intersect-const-enum.js'
+import { MalformedTypeError } from './error.js'
+import { extractAnnotations, mergeAnnotations } from './annotation.js'
 import {
 	copyName,
 	firstSplitTypeIndex,
@@ -21,7 +21,7 @@ import {
 	isNodeDocument,
 	NodeWithOrder,
 	splitTypes,
-} from './util'
+} from './util.js'
 
 
 const enumableTypeNames = [

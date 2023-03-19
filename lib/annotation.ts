@@ -1,6 +1,6 @@
-import { mergeLocations } from "./location"
-import type { CoreTypeAnnotations, NodeType } from "./types"
-import { ensureArray, uniq } from "./util"
+import { mergeLocations } from './location.js'
+import type { CoreTypeAnnotations, NodeType } from './types.js'
+import { ensureArray, uniq } from './util.js'
 
 
 export function mergeAnnotations( nodes: Array< CoreTypeAnnotations > )

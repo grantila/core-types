@@ -1,4 +1,4 @@
-import { NodePath, NodeType } from "./types"
+import type { NodePath, NodeType } from './types.js'
 
 export interface TraverseCallbackArgument
 {

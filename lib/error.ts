@@ -1,4 +1,4 @@
-import { Location, NodePath, NodeType } from "./types"
+import type { Location, NodePath, NodeType } from './types.js'
 
 
 export interface CoreTypesErrorMeta

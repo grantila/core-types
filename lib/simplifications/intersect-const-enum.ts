@@ -1,6 +1,6 @@
-import { mergeAnnotations } from "../annotation";
-import { CoreTypeAnnotations, NodeWithConstEnum } from "../types"
-import { Comparable, intersection } from "../util"
+import { mergeAnnotations } from '../annotation.js'
+import type { CoreTypeAnnotations, NodeWithConstEnum } from '../types.js'
+import { type Comparable, intersection } from '../util.js'
 
 
 export function intersectConstEnum< T extends NodeWithConstEnum >(

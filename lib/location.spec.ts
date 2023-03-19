@@ -1,10 +1,10 @@
 import {
-	positionToLineColumn,
-	locationToLineColumn,
 	getPositionOffset,
+	locationToLineColumn,
 	mergeLocations,
-} from './location'
-import { LocationWithLineColumn } from './types'
+	positionToLineColumn,
+} from './location.js'
+import type { LocationWithLineColumn } from './types.js'
 
 
 describe( "location", ( ) =>

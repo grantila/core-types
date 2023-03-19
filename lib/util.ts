@@ -1,12 +1,12 @@
-import {
-	NodeType,
-	PrimitiveType,
-	NodeWithConstEnum,
-	Types,
-	NodeTypeMap,
+import type {
 	NamedType,
 	NodeDocument,
-} from "./types"
+	NodeType,
+	NodeTypeMap,
+	NodeWithConstEnum,
+	PrimitiveType,
+	Types,
+} from './types.js'
 
 
 export function uniq< T extends Comparable | unknown >( arr: Array< T > )

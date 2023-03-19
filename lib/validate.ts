@@ -1,6 +1,6 @@
-import { MalformedTypeError } from "./error"
-import { NodeType, NodeWithConstEnum } from "./types"
-import { hasConstEnum, isEqual } from "./util"
+import { MalformedTypeError } from './error.js'
+import type { NodeType, NodeWithConstEnum } from './types.js'
+import { hasConstEnum, isEqual } from './util.js'
 
 
 export function validate( node: NodeType )

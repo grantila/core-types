@@ -1,5 +1,5 @@
-import { some, traverse, TraverseCallbackArgument } from './traverse'
-import { NodeType } from './types'
+import { type TraverseCallbackArgument, some, traverse } from './traverse.js'
+import type { NodeType } from './types.js'
 
 
 const root: NodeType = {

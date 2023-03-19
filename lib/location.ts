@@ -1,5 +1,9 @@
-import { LineColumn, LocationOffset, LocationWithLineColumn } from './types'
-import { isNonNullable } from './util';
+import type {
+	LineColumn,
+	LocationOffset,
+	LocationWithLineColumn,
+} from './types.js'
+import { isNonNullable } from './util.js'
 
 
 export function positionToLineColumn( text: string, pos: number )

@@ -1,52 +1,52 @@
-export * from './lib/types'
-export { simplify } from './lib/simplify'
-export { validate } from './lib/validate'
+export * from './lib/types.js'
+export { simplify } from './lib/simplify.js'
+export { validate } from './lib/validate.js'
 export {
-	ComparablePrimitives,
-	ComparableArray,
-	ComparableObject,
-	Comparable,
+	type Comparable,
+	type ComparableArray,
+	type ComparableObject,
+	type ComparablePrimitives,
 	ensureArray,
-	isPrimitiveType,
 	hasConstEnum,
-	isEqual,
 	intersection,
-	union,
+	isEqual,
 	isNonNullable,
-} from './lib/util'
+	isPrimitiveType,
+	union,
+} from './lib/util.js'
 export {
-	mergeAnnotations,
 	extractAnnotations,
+	formatDefault,
+	formatExamples,
+	formatSee,
+	mergeAnnotations,
+	stringify,
 	stringifyAnnotations,
 	stripAnnotations,
-	stringify,
-	formatExamples,
-	formatDefault,
-	formatSee,
-} from './lib/annotation'
+} from './lib/annotation.js'
 export {
-	CoreTypesErrorMeta,
+	type CoreTypesErrorMeta,
+	type WarnFunction,
+	decorateError,
+	decorateErrorMeta,
+	isCoreTypesError,
 	MalformedTypeError,
 	MissingReferenceError,
-	UnsupportedError,
 	RelatedError,
-	WarnFunction,
-	throwUnsupportedError,
 	throwRelatedError,
-	isCoreTypesError,
-	decorateErrorMeta,
-	decorateError,
-} from './lib/error'
+	throwUnsupportedError,
+	UnsupportedError,
+} from './lib/error.js'
 export {
-	positionToLineColumn,
-	locationToLineColumn,
 	getPositionOffset,
+	locationToLineColumn,
 	mergeLocations,
-} from './lib/location'
+	positionToLineColumn,
+} from './lib/location.js'
 export {
-	TraverseCallbackArgument,
-	SomeCallback,
-	TraverseCallback,
+	type SomeCallback,
+	type TraverseCallback,
+	type TraverseCallbackArgument,
 	some,
 	traverse,
-} from './lib/traverse'
+} from './lib/traverse.js'

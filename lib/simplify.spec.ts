@@ -1,5 +1,5 @@
-import { NodeDocument, NodeType, OrType } from './types'
-import { simplify } from './simplify'
+import type { NodeDocument, NodeType, OrType } from './types.js'
+import { simplify } from './simplify.js'
 
 
 describe( "simplify", ( ) =>
