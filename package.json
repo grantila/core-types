@@ -42,15 +42,15 @@
     "schema"
   ],
   "devDependencies": {
-    "@babel/preset-env": "^7.20.2",
-    "@babel/preset-typescript": "^7.21.0",
+    "@babel/preset-env": "^7.21.4",
+    "@babel/preset-typescript": "^7.21.4",
     "@types/jest": "^29.5.0",
     "cz-conventional-changelog": "^3.3.0",
     "jest": "^29.5.0",
     "pre-commit": "^1.2.2",
-    "rimraf": "^4.4.0",
-    "ts-jest-resolver": "^2.0.0",
-    "typescript": "5.0.2"
+    "rimraf": "^4.4.1",
+    "ts-jest-resolver": "^2.0.1",
+    "typescript": "5.0.3"
   },
   "config": {
     "commitizen": {
