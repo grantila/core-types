@@ -853,4 +853,319 @@ describe( "simplify", ( ) =>
 			type: 'string',
 		} );
 	} );
+
+	describe( "merge objects", ( ) =>
+	{
+		it( "should not merge if there are non-objects", ( ) =>
+		{
+			const node: NodeType = {
+				type: 'and',
+				and: [
+					{
+						type: 'string',
+					},
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'number' }, required: false },
+						},
+						additionalProperties: false,
+					},
+					{
+						type: 'object',
+						properties: {
+							b: { node: { type: 'boolean' }, required: false },
+						},
+						additionalProperties: false,
+					},
+				]
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( node );
+		} );
+
+		it( "should be able to simply merge two objects", ( ) =>
+		{
+			const node: NodeType = {
+				type: 'and',
+				and: [
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'number' }, required: false },
+						},
+						additionalProperties: false,
+					},
+					{
+						type: 'object',
+						properties: {
+							b: { node: { type: 'boolean' }, required: false },
+						},
+						additionalProperties: false,
+					},
+				]
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( {
+				type: 'object',
+				properties: {
+					a: { node: { type: 'number' }, required: false },
+					b: { node: { type: 'boolean' }, required: false },
+				},
+				additionalProperties: false,
+			} );
+		} );
+
+		it( "should prefer additionalProperties with node over false", ( ) =>
+		{
+			const node: NodeType = {
+				type: 'and',
+				and: [
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'number' }, required: false },
+						},
+						additionalProperties: false,
+					},
+					{
+						type: 'object',
+						properties: {
+							b: { node: { type: 'boolean' }, required: false },
+						},
+						additionalProperties: { type: 'string' },
+					},
+				]
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( {
+				type: 'object',
+				properties: {
+					a: { node: { type: 'number' }, required: false },
+					b: { node: { type: 'boolean' }, required: false },
+				},
+				additionalProperties: { type: 'string' },
+			} );
+		} );
+
+		it( "should prefer additionalProperties with true over node", ( ) =>
+		{
+			const node: NodeType = {
+				type: 'and',
+				and: [
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'number' }, required: false },
+						},
+						additionalProperties: true,
+					},
+					{
+						type: 'object',
+						properties: {
+							b: { node: { type: 'boolean' }, required: false },
+						},
+						additionalProperties: { type: 'string' },
+					},
+				]
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( {
+				type: 'object',
+				properties: {
+					a: { node: { type: 'number' }, required: false },
+					b: { node: { type: 'boolean' }, required: false },
+				},
+				additionalProperties: true,
+			} );
+		} );
+
+		it( "should prefer prefer required on conflicting property", ( ) =>
+		{
+			const node: NodeType = {
+				type: 'and',
+				and: [
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'number' }, required: false },
+						},
+						additionalProperties: false,
+					},
+					{
+						type: 'object',
+						properties: {
+							a: { node: { type: 'boolean' }, required: true },
+						},
+						additionalProperties: false,
+					},
+				]
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( {
+				type: 'object',
+				properties: {
+					a: {
+						node: {
+							type: 'and',
+							and: [ { type: 'number' }, { type: 'boolean' } ],
+						},
+						required: true,
+					},
+				},
+				additionalProperties: false,
+			} );
+		} );
+
+		it( "should handle refs and sub-intersections", ( ) =>
+		{
+			const node: NodeDocument = {
+				version: 1,
+				types: [
+					{
+						name: 'root',
+						type: 'and',
+						and: [
+							{
+								type: 'object',
+								properties: {
+									a: {
+										node: { type: 'number' },
+										required: false,
+									},
+									x: {
+										node: { type: 'number' },
+										required: false,
+									},
+								},
+								additionalProperties: false,
+							},
+							{
+								type: 'and',
+								and: [
+									{
+										type: 'object',
+										properties: {
+											b: {
+												node: { type: 'boolean' },
+												required: false,
+											},
+											x: {
+												node: { type: 'boolean' },
+												required: false,
+											},
+										},
+										additionalProperties: false,
+									},
+									{
+										type: 'object',
+										properties: {
+											c: {
+												node: { type: 'string' },
+												required: false,
+											},
+											x: {
+												node: { type: 'string' },
+												required: false,
+											},
+										},
+										additionalProperties: false,
+									},
+									{
+										type: 'ref',
+										ref: 'ext',
+									},
+								],
+							},
+						]
+					},
+					{
+						name: 'ext',
+						type: 'and',
+						and: [ {
+							type: 'and',
+							and: [
+								{
+									type: 'object',
+									properties: {
+										d: {
+											node: { type: 'null' },
+											required: false
+										},
+										x: {
+											node: { type: 'null' },
+											required: false
+										},
+									},
+									additionalProperties: false,
+								}
+							],
+						} ],
+					},
+				],
+			};
+			const result = simplify( node, { mergeObjects: true } );
+
+			expect( result ).toStrictEqual( {
+				version: 1,
+				types: [
+					{
+						name: 'root',
+						type: 'object',
+						properties: {
+							a: {
+								node: { type: 'number' },
+								required: false,
+							},
+							b: {
+								node: { type: 'boolean' },
+								required: false,
+							},
+							c: {
+								node: { type: 'string' },
+								required: false,
+							},
+							d: {
+								node: { type: 'null' },
+								required: false
+							},
+							x: {
+								node: {
+									type: 'and',
+									and: [
+										{ type: 'number' },
+										{ type: 'boolean' },
+										{ type: 'string' },
+										{ type: 'null' },
+									],
+								},
+								required: false,
+							},
+						},
+						additionalProperties: false,
+					},
+					{
+						name: 'ext',
+						type: 'object',
+						properties: {
+							d: {
+								node: { type: 'null' },
+								required: false
+							},
+							x: {
+								node: { type: 'null' },
+								required: false
+							},
+						},
+						additionalProperties: false,
+					},
+				],
+			} satisfies NodeDocument );
+		} );
+	} );
 } );

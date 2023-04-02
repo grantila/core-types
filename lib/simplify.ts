@@ -5,6 +5,8 @@ import type {
 	NodeType,
 	NodeTypeMap,
 	NodeWithConstEnum,
+	ObjectProperty,
+	ObjectType,
 	OrType,
 	TypeMap,
 	Types,
@@ -32,27 +34,90 @@ const enumableTypeNames = [
 	'boolean',
 ];
 
-export function simplify< T extends NamedType >( node: T ): NamedType;
-export function simplify< T extends NamedType >( node: Array< T > )
-: Array< NamedType >;
-export function simplify< T extends NodeType >( node: T ): NodeType;
-export function simplify< T extends NodeType >( node: Array< T > ) : NodeType;
+export interface SimplifyOptions
+{
+	/**
+	 * If true, and-types of objects are merged into one type.
+	 * This will also include ref-types that reference objects, they will all be
+	 * merged into one object.
+	 *
+	 * @default false
+	 */
+	mergeObjects?: boolean;
+}
+
+export function simplify< T extends NamedType >(
+	node: T,
+	options?: SimplifyOptions
+): NamedType;
+export function simplify< T extends NamedType >(
+	node: Array< T >,
+	options?: SimplifyOptions
+): Array< NamedType >;
 export function simplify< T extends NodeType >(
-	node: NodeDocument< 1, T >
+	node: T,
+	options?: SimplifyOptions
+): NodeType;
+export function simplify< T extends NodeType >(
+	node: Array< T >,
+	options?: SimplifyOptions
+): NodeType;
+export function simplify< T extends NodeType >(
+	node: NodeDocument< 1, T >,
+	options?: SimplifyOptions
+): NodeDocument< 1, NodeType >;
+
+export function simplify(
+	node: NodeDocument | NodeType | Array< NodeType >,
+	{ mergeObjects = false }: SimplifyOptions = { }
 )
-: NodeDocument< 1, NodeType >;
-export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 : typeof node
 {
+	const ctx: Required< SimplifyOptions > & SimplifyContext = {
+		mergeObjects,
+		refs: new Map( ),
+	};
+
 	if ( Array.isArray( node ) )
-		return node.map( node => simplify( node ) );
+		return node.map( node => simplifyImpl( node, ctx ) );
 
 	if ( isNodeDocument( node ) )
-		return {
+	{
+		const simplified = {
 			...node,
-			types: simplify( ( node as NodeDocument ).types ),
+			types: simplify( ( node as NodeDocument ).types, ctx ),
 		} as NodeDocument;
 
+		if ( !mergeObjects )
+			return simplified;
+
+		// Run simplification again, with the named refs available to merge
+		// further, if necessary
+
+		simplified.types.forEach( type =>
+		{
+			ctx.refs.set( type.name, type );
+		} );
+		simplified.types =
+			simplified.types.map( node => simplifyImpl( node, ctx ) );
+
+		return simplified;
+	}
+
+	return simplifyImpl( node, ctx );
+}
+
+interface SimplifyContext
+{
+	refs: Map< string, NodeType >;
+}
+
+export function simplifyImpl< Type extends NodeType | NamedType >(
+	node: Type,
+	ctx: Required< SimplifyOptions > & SimplifyContext
+)
+: Type
+{
 	const wrapName = ( newNode: NodeType ) => copyName( node, newNode );
 
 	if ( node.type === 'tuple' )
@@ -99,16 +164,19 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 		return wrapName( simplifySingle( node ) );
 	else if ( node.type === 'and' )
 	{
-		const and = simplifyIntersection(
-			( [ ] as NodeType[ ] ).concat(
-				...node.and.map( node =>
-				{
-					const simplifiedNode = simplify( node );
-					return ( simplifiedNode as AndType ).and
-						? ( simplifiedNode as AndType ).and
-						: [ simplifiedNode ];
-				} )
-			)
+		const and = maybeMergeObjects(
+			simplifyIntersection(
+				( [ ] as NodeType[ ] ).concat(
+					...node.and.map( node =>
+					{
+						const simplifiedNode = simplify( node );
+						return ( simplifiedNode as AndType ).and
+							? ( simplifiedNode as AndType ).and
+							: [ simplifiedNode ];
+					} )
+				)
+			),
+			ctx
 		);
 
 		if ( and.length === 1 )
@@ -116,6 +184,7 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 				...and[ 0 ],
 				...mergeAnnotations( [ extractAnnotations( node ), and[ 0 ] ] )
 			} );
+
 		return wrapName( { type: 'and', and, ...extractAnnotations( node ) } );
 	}
 	else if ( node.type === 'or' )
@@ -144,6 +213,109 @@ export function simplify( node: NodeDocument | NodeType | Array< NodeType > )
 		// istanbul ignore next
 		throw new MalformedTypeError( "Invalid node", node );
 	}
+}
+
+function maybeMergeObjects(
+	nodes: Array< NodeType >,
+	ctx: Required< SimplifyOptions > & SimplifyContext
+)
+: Array< NodeType >
+{
+	const { mergeObjects, refs } = ctx;
+
+	if ( !mergeObjects || nodes.length < 2 )
+		return nodes;
+
+	const visited = new Set< NodeType >( );
+
+	const expandNode = ( node: NodeType ): Array< NodeType > =>
+	{
+		if ( visited.has( node ) )
+			throw new Error( `Cyclic dependency detected` );
+		visited.add( node );
+
+		if ( node.type === 'object' )
+			return [ node ];
+
+		else if ( node.type === 'ref' )
+		{
+			const ref = refs.get( node.ref );
+			if ( !ref )
+				// Return the node itself if the ref wasn't found - we'll not
+				// try to merge this tree if there are missing refs.
+				return [ node ];
+
+			return expandNode( ref );
+		}
+
+		else if ( node.type === 'and' )
+			return node.and.flatMap( node => expandNode( node ) );
+
+		return [ node ];
+	};
+
+	const expanded = nodes.flatMap( node => expandNode( node ) );
+
+	if ( expanded.some( node => node.type !== 'object' ) )
+		// Any of the nodes was not an object, so won't try to merge.
+		return nodes;
+
+	const objects = expanded as Array< ObjectType >;
+
+	const mergedAnnotations =
+		mergeAnnotations( objects.map( obj => extractAnnotations( obj ) ) );
+
+	// Pick the loosest value
+	const additionalProperties: boolean | NodeType = objects.reduce(
+		( prev, cur ) =>
+			prev === false
+			? cur.additionalProperties
+			: prev === true
+			? prev
+			: cur.additionalProperties
+		,
+		false as boolean | NodeType
+	);
+
+	const allProperties = new Map< string, ObjectProperty[ ] >( );
+	objects.forEach( obj =>
+	{
+		Object.entries( obj.properties ).forEach( ( [ name, prop ] ) =>
+		{
+			const props = allProperties.get( name ) ?? [ ];
+			props.push( prop );
+			allProperties.set( name, props );
+		} );
+	} );
+
+	const properties = Object.fromEntries(
+		[ ...allProperties.entries( ) ]
+		.map( ( [ name, props ] ): [ string, ObjectProperty ] =>
+		{
+			// If any is required, it's required
+			const required = props.reduce(
+				( prev, cur ) => prev || cur.required,
+				false
+			);
+
+			const node = simplifyImpl(
+				{
+					type: 'and',
+					and: props.map( prop => prop.node ),
+				},
+				ctx
+			);
+
+			return [ name,  { node, required } ];
+		} )
+	);
+
+	return [ {
+		type: 'object',
+		properties,
+		additionalProperties,
+		...mergedAnnotations,
+	} ];
 }
 
 // Combine types/nodes where one is more generic than some other, or where
